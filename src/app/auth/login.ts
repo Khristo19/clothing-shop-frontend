@@ -1,10 +1,10 @@
 // src/app/auth/login.ts
-import { Component, signal } from '@angular/core';
+import { Component, signal, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../core/auth';
-import { switchMap, finalize } from 'rxjs';
+import { switchMap, finalize, takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -15,13 +15,16 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrls: ['./login.scss'],
 })
 export class LoginComponent {
+  private destroyRef = inject(DestroyRef);
+  private auth = inject(AuthService);
+  private router = inject(Router);
 
   email = '';
   password = '';
   loading = signal(false);
   error = signal('');
 
-  constructor(private auth: AuthService, private router: Router) {
+  constructor() {
     // If already logged in, redirect!
     const role = this.auth.role();
     if (role === 'admin') {
@@ -41,7 +44,7 @@ export class LoginComponent {
           return this.auth.fetchAndSetMe();
         }),
         finalize(() => this.loading.set(false)),
-        takeUntilDestroyed()
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: () => {
