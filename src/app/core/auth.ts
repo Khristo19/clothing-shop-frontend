@@ -3,10 +3,11 @@ import { HttpClient, HttpInterceptorFn, HttpErrorResponse } from '@angular/commo
 import { Router } from '@angular/router';
 import { CanActivateFn } from '@angular/router';
 import { catchError, of, tap } from 'rxjs';
+import { environment } from '../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private API_URL = 'https://clothing-shop-backend.vercel.app/api/auth';
+  private API_URL = `${environment.apiUrl}/auth`;
 
   // --- SIGNALS ---
   private _token = signal<string | null>(this.getTokenFromStorage());
@@ -39,12 +40,22 @@ export class AuthService {
   }
 
   saveToken(token: string) {
-    localStorage.setItem('token', token);
-    this._token.set(token);
+    try {
+      localStorage.setItem('token', token);
+      this._token.set(token);
+    } catch (error) {
+      console.error('Failed to save token to localStorage:', error);
+      this._token.set(token);
+    }
   }
 
   getTokenFromStorage(): string | null {
-    return localStorage.getItem('token');
+    try {
+      return localStorage.getItem('token');
+    } catch (error) {
+      console.error('Failed to read token from localStorage:', error);
+      return null;
+    }
   }
 
   getToken(): string | null {
@@ -54,7 +65,9 @@ export class AuthService {
   decodeRole(token: string | null): 'admin' | 'cashier' | null {
     if (!token) return null;
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const payload = JSON.parse(atob(parts[1]));
       return payload.role;
     } catch {
       return null;
@@ -62,7 +75,11 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('token');
+    try {
+      localStorage.removeItem('token');
+    } catch (error) {
+      console.error('Failed to remove token from localStorage:', error);
+    }
     this._token.set(null);
     this.router.navigate(['/login']);
   }
@@ -70,14 +87,23 @@ export class AuthService {
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
-  const token = localStorage.getItem('token');
+  let token: string | null = null;
+  try {
+    token = localStorage.getItem('token');
+  } catch (error) {
+    console.error('Failed to read token from localStorage:', error);
+  }
   const authReq = token
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : req;
   return next(authReq).pipe(
     catchError((err: unknown) => {
       if (err instanceof HttpErrorResponse && err.status === 401) {
-        localStorage.removeItem('token');
+        try {
+          localStorage.removeItem('token');
+        } catch (error) {
+          console.error('Failed to remove token from localStorage:', error);
+        }
         router.navigate(['/login']);
       }
       throw err;
@@ -87,7 +113,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
-  const token = localStorage.getItem('token');
+  let token: string | null = null;
+  try {
+    token = localStorage.getItem('token');
+  } catch (error) {
+    console.error('Failed to read token from localStorage:', error);
+  }
   if (!token) {
     router.navigate(['/login']);
     return false;
@@ -98,13 +129,23 @@ export const authGuard: CanActivateFn = () => {
 export function roleGuard(requiredRole: 'admin' | 'cashier'): CanActivateFn {
   return () => {
     const router = inject(Router);
-    const token = localStorage.getItem('token');
+    let token: string | null = null;
+    try {
+      token = localStorage.getItem('token');
+    } catch (error) {
+      console.error('Failed to read token from localStorage:', error);
+    }
     if (!token) {
       router.navigate(['/login']);
       return false;
     }
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        router.navigate(['/login']);
+        return false;
+      }
+      const payload = JSON.parse(atob(parts[1]));
       const ok = payload.role === requiredRole;
       if (!ok) router.navigate(['/login']);
       return ok;
@@ -114,4 +155,3 @@ export function roleGuard(requiredRole: 'admin' | 'cashier'): CanActivateFn {
     }
   };
 }
-

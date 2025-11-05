@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment.development';
+import { Sale } from '../core/models';
 
 @Injectable({ providedIn: 'root' })
 export class OrdersService {
   private readonly http = inject(HttpClient);
-  private readonly BASE = 'https://clothing-shop-backend.vercel.app/api/sales';
+  private readonly BASE = `${environment.apiUrl}/sales`;
 
-  history() { return this.http.get<any[]>(`${this.BASE}/history.js`); }
+  history() { return this.http.get<Sale[]>(`${this.BASE}/history.js`); }
 }
-
-
