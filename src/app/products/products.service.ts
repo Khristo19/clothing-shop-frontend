@@ -1,15 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment.development';
+import { Item } from '../core/models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductsService {
   private readonly http = inject(HttpClient);
-  private readonly BASE = 'https://clothing-shop-backend.vercel.app/api/items';
+  private readonly BASE = `${environment.apiUrl}/items`;
 
-  list() { return this.http.get<any[]>(`${this.BASE}/list.js`); }
-  add(payload: { name: string; description?: string; price: number; quantity: number; image_url?: string }) {
-    return this.http.post<any>(`${this.BASE}/add.js`, payload);
+  list() { return this.http.get<Item[]>(`${this.BASE}/list.js`); }
+  add(payload: Omit<Item, 'id'>) {
+    return this.http.post<Item>(`${this.BASE}/add.js`, payload);
   }
 }
-
-

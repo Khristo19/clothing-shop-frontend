@@ -1,41 +1,37 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment.development';
+import { Item, Offer, Sale, CreateOfferRequest, UpdateOfferStatusRequest, SubmitCartRequest } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly BASE = 'https://clothing-shop-backend.vercel.app/api';
+  private readonly BASE = environment.apiUrl;
 
   // Items
   listItems() {
-    return this.http.get<any[]>(`${this.BASE}/items/list.js`);
+    return this.http.get<Item[]>(`${this.BASE}/items/list.js`);
   }
-  addItem(payload: { name: string; description?: string; price: number; quantity: number; image_url?: string }) {
-    return this.http.post<any>(`${this.BASE}/items/add.js`, payload);
+  addItem(payload: Omit<Item, 'id'>) {
+    return this.http.post<Item>(`${this.BASE}/items/add.js`, payload);
   }
 
   // Offers
   listOffers() {
-    return this.http.get<any[]>(`${this.BASE}/offers/list.js`);
+    return this.http.get<Offer[]>(`${this.BASE}/offers/list.js`);
   }
-  createOffer(payload: { from_shop: string; items: any[]; requested_discount: any }) {
-    return this.http.post<any>(`${this.BASE}/offers/create.js`, payload);
+  createOffer(payload: CreateOfferRequest) {
+    return this.http.post<Offer>(`${this.BASE}/offers/create.js`, payload);
   }
-  updateOfferStatus(payload: { offer_id: number; status: 'approved' | 'rejected' }) {
-    return this.http.put<any>(`${this.BASE}/offers/approve.js`, payload);
+  updateOfferStatus(payload: UpdateOfferStatusRequest) {
+    return this.http.put<Offer>(`${this.BASE}/offers/approve.js`, payload);
   }
 
   // Sales / Orders
-  submitCart(payload: { items: any[]; total: number; payment_method: 'cash' | 'card-TBC' | 'card-BOG' }) {
-    return this.http.post<any>(`${this.BASE}/sales/cart.js`, payload);
+  submitCart(payload: SubmitCartRequest) {
+    return this.http.post<Sale>(`${this.BASE}/sales/cart.js`, payload);
   }
   salesHistory() {
-    return this.http.get<any[]>(`${this.BASE}/sales/history.js`);
+    return this.http.get<Sale[]>(`${this.BASE}/sales/history.js`);
   }
 }
-
-
-
-
-
-

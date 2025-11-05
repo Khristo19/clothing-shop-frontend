@@ -2,6 +2,9 @@ import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../core/api';
+import { SettingsService } from '../core/settings.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Item } from '../core/models';
 
 type Product = {
   id: number;
@@ -25,6 +28,7 @@ type Banner = { text: string; tone: 'info' | 'error' };
 export class CashierComponent implements OnDestroy {
   private api = inject(ApiService);
   private fb = inject(FormBuilder);
+  private settingsService = inject(SettingsService);
   private bannerTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly products = signal<Product[]>([]);
@@ -63,7 +67,10 @@ export class CashierComponent implements OnDestroy {
     this.cart().reduce((sum, item) => sum + item.price * item.qty, 0)
   );
   readonly discount = computed(() => 0);
-  readonly tax = computed(() => this.subtotal() * 0);
+  readonly tax = computed(() => {
+    const taxRate = this.settingsService.getTaxRate();
+    return this.subtotal() * (taxRate / 100);
+  });
   readonly total = computed(() => this.subtotal() - this.discount() + this.tax());
   readonly totalItems = computed(() => this.cart().reduce((sum, item) => sum + item.qty, 0));
 
@@ -88,11 +95,11 @@ export class CashierComponent implements OnDestroy {
     this.productError.set(null);
     this.api.listItems().subscribe({
       next: (rows) => {
-        const mapped: Product[] = (rows ?? []).map((row: any) => ({
-          id: Number(row.id ?? 0),
+        const mapped: Product[] = rows.map((row) => ({
+          id: row.id,
           name: row.name ?? 'Unnamed item',
-          price: Number(row.price ?? 0),
-          stock: Number(row.quantity ?? 0),
+          price: row.price,
+          stock: row.quantity,
           description: row.description ?? '',
           imageUrl: row.image_url ?? null,
         }));
