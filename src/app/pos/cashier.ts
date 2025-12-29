@@ -3,14 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ApiService } from '../core/api';
 import { SettingsService } from '../core/settings.service';
+import { TranslationService } from '../core/translation.service';
+import { DarkModeService } from '../core/dark-mode.service';
+import { AuthService } from '../core/auth';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Item } from '../core/models';
+import { Item, Location, User } from '../core/models';
 
 type Product = {
   id: number;
   name: string;
   price: number;
   stock: number;
+  size?: string | null;
   description?: string | null;
   imageUrl?: string | null;
 };
@@ -29,6 +33,11 @@ export class CashierComponent implements OnDestroy {
   private api = inject(ApiService);
   private fb = inject(FormBuilder);
   private settingsService = inject(SettingsService);
+  private authService = inject(AuthService);
+  readonly translate = inject(TranslationService);
+  readonly darkMode = inject(DarkModeService);
+  readonly t = computed(() => this.translate.t());
+  readonly isDarkMode = computed(() => this.darkMode.isDarkMode());
   private bannerTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly products = signal<Product[]>([]);
@@ -38,9 +47,14 @@ export class CashierComponent implements OnDestroy {
   readonly search = signal('');
 
   readonly cart = signal<CartItem[]>([]);
-  payment: 'cash' | 'card' = 'cash';
-  readonly cardBank = signal<'TBC' | 'BOG' | null>(null);
-  readonly cardModalOpen = signal(false);
+  payment: 'cash' | 'TBC' | 'BOG' = 'cash';
+
+  // Location and cashier selection
+  readonly locations = signal<Location[]>([]);
+  readonly cashiers = signal<User[]>([]);
+  selectedLocationId = signal<number | null>(null);
+  selectedServedByCashierId = signal<number | null>(null);
+  selectedPartnerCashierId = signal<number | null>(null);
 
   readonly banner = signal<Banner | null>(null);
   readonly offerModalOpen = signal(false);
@@ -48,7 +62,7 @@ export class CashierComponent implements OnDestroy {
 
   readonly offerForm = this.fb.nonNullable.group({
     from_shop: ['POS Front Desk', [Validators.required]],
-    discount_type: ['percentage' as 'percentage' | 'amount', [Validators.required]],
+    discount_type: ['percentage' as 'percentage' | 'manual', [Validators.required]],
     discount_value: [10, [Validators.required, Validators.min(0)]],
     notes: [''],
   });
@@ -76,6 +90,38 @@ export class CashierComponent implements OnDestroy {
 
   constructor() {
     this.loadProducts();
+    this.loadLocations();
+    this.loadCashiers();
+    this.autoSelectCurrentCashier();
+  }
+
+  private loadLocations() {
+    this.api.listLocations().subscribe({
+      next: (locations) => {
+        this.locations.set(locations);
+      },
+      error: (err) => {
+        console.error('Failed to load locations:', err);
+      }
+    });
+  }
+
+  private loadCashiers() {
+    this.api.listCashiers().subscribe({
+      next: (users) => {
+        this.cashiers.set(users);
+      },
+      error: (err) => {
+        console.error('Failed to load cashiers:', err);
+      }
+    });
+  }
+
+  private autoSelectCurrentCashier() {
+    const currentUser = this.authService.user();
+    if (currentUser && currentUser.role === 'cashier') {
+      this.selectedServedByCashierId.set(currentUser.id);
+    }
   }
 
   ngOnDestroy() {
@@ -100,6 +146,7 @@ export class CashierComponent implements OnDestroy {
           name: row.name ?? 'Unnamed item',
           price: row.price,
           stock: row.quantity,
+          size: row.size ?? null,
           description: row.description ?? '',
           imageUrl: row.image_url ?? null,
         }));
@@ -162,28 +209,10 @@ export class CashierComponent implements OnDestroy {
   clearCart() {
     this.cart.set([]);
     this.payment = 'cash';
-    this.cardBank.set(null);
   }
 
-  setPayment(method: 'cash' | 'card') {
-    if (method === 'card') {
-      this.cardModalOpen.set(true);
-    } else {
-      this.payment = 'cash';
-      this.cardBank.set(null);
-    }
-  }
-
-  confirmCardBank(bank: 'TBC' | 'BOG') {
-    this.cardBank.set(bank);
-    this.payment = 'card';
-    this.cardModalOpen.set(false);
-  }
-
-  cancelCardSelection() {
-    this.cardModalOpen.set(false);
-    this.payment = 'cash';
-    this.cardBank.set(null);
+  setPayment(method: 'cash' | 'TBC' | 'BOG') {
+    this.payment = method;
   }
 
   openOfferModal() {
@@ -193,7 +222,7 @@ export class CashierComponent implements OnDestroy {
     }
     this.offerForm.reset({
       from_shop: 'POS Front Desk',
-      discount_type: 'percentage' as 'percentage' | 'amount',
+      discount_type: 'percentage' as 'percentage' | 'manual',
       discount_value: 10,
       notes: ''
     });
@@ -214,6 +243,7 @@ export class CashierComponent implements OnDestroy {
       return;
     }
     const formValue = this.offerForm.getRawValue();
+
     const payload = {
       from_shop: formValue.from_shop,
       items: this.cart().map((item) => ({ id: item.id, qty: item.qty, name: item.name, price: item.price })),
@@ -223,6 +253,7 @@ export class CashierComponent implements OnDestroy {
         notes: formValue.notes,
         cart_total: this.total(),
       },
+      payment_method: this.payment,
     };
     this.offerSubmitting.set(true);
     this.api.createOffer(payload).subscribe({
@@ -238,38 +269,6 @@ export class CashierComponent implements OnDestroy {
     });
   }
 
-  cardChipStyles() {
-    const bank = this.cardBank();
-    if (this.payment !== 'card' || !bank) {
-      return {
-        background: '#f9fafb',
-        color: '#111827',
-        border: '1px solid #d1d5db',
-      };
-    }
-    return bank === 'TBC'
-      ? { background: '#dbeafe', color: '#1d4ed8', border: '1px solid #2563eb' }
-      : { background: '#ffedd5', color: '#c2410c', border: '1px solid #f97316' };
-  }
-
-  cardBankLabel() {
-    const bank = this.cardBank();
-    if (!bank) return '';
-    return bank === 'TBC' ? '(TBC Bank)' : '(Bank of Georgia)';
-  }
-
-  cardButtonStyles(bank: 'TBC' | 'BOG') {
-    const selected = this.cardBank() === bank;
-    if (bank === 'TBC') {
-      return selected
-        ? { background: '#1d4ed8', color: '#fff', border: '1px solid #1d4ed8' }
-        : { background: '#e0f2fe', color: '#1d4ed8', border: '1px solid #60a5fa' };
-    }
-    return selected
-      ? { background: '#f97316', color: '#fff', border: '1px solid #ea580c' }
-      : { background: '#ffedd5', color: '#c2410c', border: '1px solid #fbbf24' };
-  }
-
   readonly trackProduct = (_: number, product: Product) => product.id;
   readonly trackCart = (_: number, item: CartItem) => item.id;
 
@@ -278,17 +277,8 @@ export class CashierComponent implements OnDestroy {
       this.notify('Add at least one item before saving the order.', 'error');
       return;
     }
-    if (this.payment === 'card' && !this.cardBank()) {
-      this.notify('Select a bank to process the card payment.', 'error');
-      this.cardModalOpen.set(true);
-      return;
-    }
 
-    const bank = this.cardBank();
-    const paymentMethod: 'cash' | 'card-TBC' | 'card-BOG' =
-      this.payment === 'card' && bank ? (bank === 'TBC' ? 'card-TBC' : 'card-BOG') : 'cash';
-
-    const payload = {
+    const payload: any = {
       items: this.cart().map((item) => ({
         id: item.id,
         qty: item.qty,
@@ -296,15 +286,26 @@ export class CashierComponent implements OnDestroy {
         name: item.name,
       })),
       total: this.total(),
-      payment_method: paymentMethod,
+      payment_method: this.payment,
     };
+
+    // Add optional location and cashier fields
+    if (this.selectedLocationId()) {
+      payload.location_id = this.selectedLocationId();
+    }
+    if (this.selectedServedByCashierId()) {
+      payload.served_by_cashier_id = this.selectedServedByCashierId();
+    }
+    if (this.selectedPartnerCashierId()) {
+      payload.partner_cashier_id = this.selectedPartnerCashierId();
+    }
 
     this.api.submitCart(payload).subscribe({
       next: () => {
         this.notify('Sale completed. Ready for the next customer!');
         this.cart.set([]);
         this.payment = 'cash';
-        this.cardBank.set(null);
+        // Keep location and cashier selections for next sale
         this.loadProducts();
       },
       error: (err) => {

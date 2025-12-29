@@ -1,1 +1,773 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles for clothing shop admin */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Button Styles */
+button {
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #3b82f6;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &[type="button"] {
+    background: #f3f4f6;
+    color: #374151;
+
+    &:hover:not(:disabled) {
+      background: #e5e7eb;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+/* Input Styles */
+input, textarea, select {
+  font-family: inherit;
+  font-size: 0.875rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+/* Table Styles */
+table {
+  &:hover tbody tr {
+    &:hover {
+      background: #f9fafb;
+    }
+  }
+}
+
+/* Card Styles */
+.card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Stat Card Styles */
+.stat-card {
+  flex: 1 1 160px;
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .stat-label {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  .stat-value {
+    margin: 0.5rem 0 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+  }
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.875rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.badge-success {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  &.badge-warning {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+
+  &.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+}
+
+/* Alert Styles */
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  &.alert-error {
+    background: #fef2f2;
+    color: #991b1b;
+    border-left: 4px solid #dc2626;
+  }
+
+  &.alert-info {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-left: 4px solid #3b82f6;
+  }
+
+  &.alert-success {
+    background: #f0fdf4;
+    color: #166534;
+    border-left: 4px solid #22c55e;
+  }
+}
+
+/* Animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease;
+}
+
+/* Layout classes for dark mode */
+.bg-light {
+  background: #f3f4f6 !important;
+}
+
+.bg-dark {
+  background: #0f172a !important;
+}
+
+.admin-header {
+  background: #fff;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+
+  &.dark {
+    background: #1e293b;
+    border-bottom-color: #334155;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+}
+
+.header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  transition: color 0.3s ease;
+
+  &.dark {
+    color: #f1f5f9;
+  }
+}
+
+.header-subtitle {
+  margin: 0.25rem 0 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+
+  &.dark {
+    color: #94a3b8;
+  }
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow: auto;
+  background: #f3f4f6;
+  transition: background-color 0.3s ease;
+
+  &.dark {
+    background: #0f172a;
+  }
+}
+
+/* Dark Mode Styles */
+html.dark {
+  background: #0f172a;
+  color: #e2e8f0;
+
+  body {
+    background: #0f172a;
+    color: #e2e8f0;
+  }
+
+  /* NUCLEAR OPTION: Override ALL white backgrounds */
+  * {
+    &[style*="background:white"],
+    &[style*="background:#fff"],
+    &[style*="background: white"],
+    &[style*="background: #fff"],
+    &[style*="background:#ffffff"],
+    &[style*="background: #ffffff"] {
+      background: #1e293b !important;
+    }
+
+    /* Override light gray backgrounds too */
+    &[style*="background:#f9fafb"],
+    &[style*="background:#f3f4f6"],
+    &[style*="background: #f9fafb"],
+    &[style*="background: #f3f4f6"] {
+      background: #0f172a !important;
+    }
+  }
+
+  /* Make sure ALL text is visible */
+  div, section, form, p, span {
+    &:not([style*="color:#"]):not([class*="badge"]) {
+      color: #e2e8f0;
+    }
+  }
+
+  /* Buttons in dark mode */
+  button {
+    &:not([style*="background:#ef4444"]):not([style*="background:#3b82f6"]):not([style*="background:#6b7280"]) {
+      background: #334155 !important;
+      color: #f1f5f9 !important;
+
+      &:hover:not(:disabled) {
+        background: #475569 !important;
+      }
+    }
+  }
+
+  /* Inputs in dark mode */
+  input, textarea, select {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+
+    &::placeholder {
+      color: #64748b !important;
+    }
+
+    &:focus {
+      border-color: #3b82f6 !important;
+      background: #1e293b !important;
+    }
+  }
+
+  /* All labels in dark mode */
+  label {
+    color: #cbd5e1 !important;
+  }
+
+  /* Specific label overrides */
+  label[style*="margin:0"],
+  label[style*="font-weight:600"] {
+    color: #f1f5f9 !important;
+  }
+
+  /* Cards */
+  .card {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  /* Stat Cards */
+  .stat-card {
+    background: #1e293b;
+    border-color: #334155;
+
+    .stat-label {
+      color: #94a3b8;
+    }
+
+    .stat-value {
+      color: #f1f5f9;
+    }
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  /* Badges */
+  .badge {
+    &.badge-success {
+      background: #065f46;
+      color: #a7f3d0;
+    }
+
+    &.badge-warning {
+      background: #78350f;
+      color: #fde68a;
+    }
+
+    &.badge-danger {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+
+    &.badge-info {
+      background: #1e3a8a;
+      color: #93c5fd;
+    }
+  }
+
+  /* Alerts */
+  .alert {
+    &.alert-error {
+      background: #7f1d1d;
+      color: #fca5a5;
+      border-left-color: #dc2626;
+    }
+
+    &.alert-info {
+      background: #1e3a8a;
+      color: #93c5fd;
+      border-left-color: #3b82f6;
+    }
+
+    &.alert-success {
+      background: #065f46;
+      color: #a7f3d0;
+      border-left-color: #22c55e;
+    }
+  }
+
+  /* Tables */
+  table {
+    thead {
+      background: #1e293b !important;
+
+      th {
+        color: #e2e8f0;
+      }
+    }
+
+    tbody {
+      tr {
+        border-top-color: #334155 !important;
+
+        &:hover {
+          background: #1e293b !important;
+        }
+
+        td {
+          color: #e2e8f0;
+
+          small {
+            color: #94a3b8 !important;
+          }
+        }
+      }
+    }
+  }
+
+  /* Override all inline background styles - COMPREHENSIVE */
+  div[style*="background:#fff"],
+  div[style*="background:white"],
+  div[style*="background: #fff"],
+  div[style*="background: white"],
+  section[style*="background:#fff"],
+  section[style*="background:white"],
+  section[style*="background: #fff"],
+  section[style*="background: white"],
+  form[style*="background:#fff"],
+  form[style*="background:white"] {
+    background: #1e293b !important;
+  }
+
+  div[style*="background:#f9fafb"],
+  div[style*="background:#f3f4f6"],
+  div[style*="background: #f9fafb"],
+  div[style*="background: #f3f4f6"],
+  section[style*="background:#f9fafb"],
+  section[style*="background:#f3f4f6"],
+  section[style*="background: #f9fafb"],
+  section[style*="background: #f3f4f6"] {
+    background: #1e293b !important;
+  }
+
+  /* Text colors */
+  h1, h2, h3, h4, h5, h6 {
+    color: #f1f5f9 !important;
+  }
+
+  p, span, div {
+    &[style*="color:#6b7280"] {
+      color: #94a3b8 !important;
+    }
+
+    &[style*="color:#111827"] {
+      color: #f1f5f9 !important;
+    }
+
+    &[style*="color:#374151"] {
+      color: #cbd5e1 !important;
+    }
+  }
+
+  /* Borders */
+  [style*="border:1px solid #e5e7eb"],
+  [style*="border-bottom:1px solid #e5e7eb"],
+  [style*="border-top:1px solid"],
+  [style*="border-radius"] {
+    border-color: #334155 !important;
+  }
+
+  [style*="border:1px dashed #d1d5db"] {
+    border-color: #475569 !important;
+  }
+
+  /* Empty state messages */
+  div[style*="text-align:center"][style*="color:#6b7280"] {
+    color: #94a3b8 !important;
+  }
+
+  /* Code blocks */
+  code, pre {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+  }
+
+  /* Forms and sections */
+  section, form {
+    [style*="background:white"],
+    [style*="background:#fff"] {
+      background: #1e293b !important;
+    }
+  }
+
+  /* Sidebar */
+  aside {
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  /* Product image placeholders */
+  div[style*="background:#f3f4f6"][style*="border-radius"] {
+    background: #334155 !important;
+  }
+
+  /* Small text */
+  small {
+    color: #94a3b8 !important;
+  }
+
+  /* Strong/bold text */
+  strong {
+    color: #f1f5f9 !important;
+  }
+
+  /* Lists */
+  ul, ol {
+    li {
+      color: #e2e8f0 !important;
+    }
+  }
+
+  /* Specific overrides for inline styles */
+  * {
+    &[style*="background:#eff6ff"] {
+      background: #1e3a8a !important;
+    }
+
+    &[style*="background:#e0f2fe"] {
+      background: #075985 !important;
+    }
+
+    &[style*="background:#fef2f2"] {
+      background: #7f1d1d !important;
+    }
+
+    &[style*="background:#f0fdf4"] {
+      background: #065f46 !important;
+    }
+
+    &[style*="color:#1e40af"] {
+      color: #93c5fd !important;
+    }
+
+    &[style*="color:#0369a1"] {
+      color: #7dd3fc !important;
+    }
+
+    &[style*="color:#991b1b"] {
+      color: #fca5a5 !important;
+    }
+
+    &[style*="color:#166534"] {
+      color: #86efac !important;
+    }
+  }
+
+  /* File upload info box */
+  div[style*="background:#e0f2fe"][style*="border-radius"] {
+    background: #075985 !important;
+    color: #7dd3fc !important;
+  }
+
+  /* Info callouts */
+  div[style*="background:#eff6ff"][style*="border:#bfdbfe"] {
+    background: #1e3a8a !important;
+    border-color: #3b82f6 !important;
+
+    h3, p {
+      color: #93c5fd !important;
+    }
+  }
+
+  /* Product form specific fixes - VERY IMPORTANT */
+  section[style*="background:white"],
+  section[style*="background:#fff"],
+  section[style*="background: white"],
+  section[style*="background: #fff"] {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  section[style*="box-shadow"] {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  /* Form headers and titles */
+  h2[style*="font-weight:600"],
+  h2[style*="font-size:1.25rem"] {
+    color: #f1f5f9 !important;
+  }
+
+  /* Image upload section background */
+  div[style*="background:#f9fafb"][style*="padding:1rem"] {
+    background: #0f172a !important;
+    border: 1px solid #334155;
+  }
+
+  /* File selected info box */
+  div[style*="background:#e0f2fe"][style*="color:#0369a1"] {
+    background: #075985 !important;
+    color: #7dd3fc !important;
+  }
+
+  /* Image preview container */
+  div[style*="border:1px solid #e5e7eb"][style*="background:white"] {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+
+    p[style*="color:#374151"] {
+      color: #cbd5e1 !important;
+    }
+  }
+
+  /* Form section dividers */
+  div[style*="border-top:1px solid #e5e7eb"] {
+    border-top-color: #334155 !important;
+  }
+
+  /* Helper text in forms */
+  p[style*="color:#6b7280"],
+  p[style*="font-size:.75rem"],
+  p[style*="font-size:.875rem"] {
+    color: #94a3b8 !important;
+  }
+
+  /* All paragraph text in sections/forms */
+  section p,
+  form p,
+  div p {
+    &:not([class]) {
+      color: #cbd5e1 !important;
+    }
+  }
+
+  /* File input styling */
+  input[type="file"] {
+    color: #e2e8f0 !important;
+
+    &::file-selector-button {
+      background: #334155 !important;
+      color: #f1f5f9 !important;
+      border: 1px solid #475569 !important;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 1rem;
+
+      &:hover {
+        background: #475569 !important;
+      }
+    }
+  }
+
+  /* Settings page specific fixes */
+  div[style*="max-width:700px"] {
+    div[style*="background:white"] {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+
+    h2[style*="color:#111827"] {
+      color: #f1f5f9 !important;
+    }
+
+    div[style*="background:#eff6ff"] {
+      background: #1e3a8a !important;
+      border-color: #3b82f6 !important;
+
+      h3, p {
+        color: #93c5fd !important;
+      }
+    }
+  }
+
+  /* All inline styled elements - comprehensive override */
+  * {
+    &[style*="color:#111827"] {
+      color: #f1f5f9 !important;
+    }
+
+    &[style*="color:#374151"] {
+      color: #cbd5e1 !important;
+    }
+  }
+
+  /* Ensure ALL borders are dark mode compatible */
+  * {
+    &[style*="border:1px solid #e5e7eb"],
+    &[style*="border-bottom:1px solid #e5e7eb"],
+    &[style*="border-top:1px solid #e5e7eb"],
+    &[style*="border:2px solid #e5e7eb"] {
+      border-color: #334155 !important;
+    }
+  }
+
+  /* Orders page dark mode fixes */
+  article {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+
+    header {
+      background: #1e293b !important;
+
+      &[style*="background:#f9fafb"] {
+        background: #0f172a !important;
+      }
+
+      h3 {
+        color: #f1f5f9 !important;
+      }
+
+      small {
+        color: #94a3b8 !important;
+      }
+
+      div[style*="background:#eff6ff"] {
+        background: #1e3a8a !important;
+        color: #93c5fd !important;
+      }
+    }
+
+    div[style*="background:#fafafa"] {
+      background: #0f172a !important;
+      border-color: #334155 !important;
+    }
+
+    div[style*="background:white"][style*="border-radius:12px"] {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+
+    div[style*="background:#f3f4f6"] {
+      background: #334155 !important;
+    }
+  }
+
+  /* Empty state dark mode */
+  div[style*="border:2px dashed"][style*="background:#f9fafb"] {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+  }
+
+  /* Gradient cards - keep gradients but adjust for dark mode */
+  .stat-card[style*="linear-gradient"] {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  }
+}

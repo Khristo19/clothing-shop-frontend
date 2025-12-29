@@ -1,45 +1,101 @@
-<div style="display:flex;min-height:100vh;background:#f3f4f6">
-  <aside style="width:240px;padding:1.5rem;background:#111827;color:#f9fafb;display:flex;flex-direction:column;gap:2rem">
-    <div>
-      <h2 style="margin:0;font-size:1.25rem">Clothing Shop</h2>
-      <p style="margin:.25rem 0 0;color:#9ca3af;font-size:.875rem">Admin dashboard</p>
+<div style="display:flex;min-height:100vh" [class.bg-light]="!isDarkMode()" [class.bg-dark]="isDarkMode()">
+  <aside style="width:260px;padding:1.5rem;background:linear-gradient(180deg, #1e293b 0%, #0f172a 100%);color:#f9fafb;display:flex;flex-direction:column;gap:2rem;box-shadow:2px 0 12px rgba(0,0,0,0.1)"
+         [style.box-shadow]="isDarkMode() ? '2px 0 12px rgba(0,0,0,0.5)' : '2px 0 12px rgba(0,0,0,0.1)'">
+    <div style="padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,0.1)">
+      <h2 style="margin:0;font-size:1.5rem;font-weight:700;background:linear-gradient(135deg, #3b82f6, #8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">{{ t().dashboard.title }}</h2>
+      <p style="margin:.5rem 0 0;color:#94a3b8;font-size:.875rem;font-weight:500">{{ t().dashboard.adminPortal }}</p>
     </div>
-    <nav style="display:flex;flex-direction:column;gap:.5rem">
+    <nav style="display:flex;flex-direction:column;gap:.375rem">
       <a routerLink="/admin/products" routerLinkActive="active"
-         style="padding:.5rem 1rem;border-radius:8px;color:inherit;text-decoration:none">
-        Products
+         style="padding:.75rem 1rem;border-radius:10px;color:inherit;text-decoration:none;display:flex;align-items:center;gap:.75rem;font-weight:500;transition:all 0.2s ease">
+        <span style="font-size:1.25rem">📦</span>
+        <span>{{ t().nav.products }}</span>
       </a>
       <a routerLink="/admin/offers" routerLinkActive="active"
-         style="padding:.5rem 1rem;border-radius:8px;color:inherit;text-decoration:none">
-        Offers
+         style="padding:.75rem 1rem;border-radius:10px;color:inherit;text-decoration:none;display:flex;align-items:center;gap:.75rem;font-weight:500;transition:all 0.2s ease">
+        <span style="font-size:1.25rem">🏷️</span>
+        <span>{{ t().nav.offers }}</span>
       </a>
       <a routerLink="/admin/orders" routerLinkActive="active"
-         style="padding:.5rem 1rem;border-radius:8px;color:inherit;text-decoration:none">
-        Orders
+         style="padding:.75rem 1rem;border-radius:10px;color:inherit;text-decoration:none;display:flex;align-items:center;gap:.75rem;font-weight:500;transition:all 0.2s ease">
+        <span style="font-size:1.25rem">📋</span>
+        <span>{{ t().nav.orders }}</span>
+      </a>
+      <a routerLink="/admin/users" routerLinkActive="active"
+         style="padding:.75rem 1rem;border-radius:10px;color:inherit;text-decoration:none;display:flex;align-items:center;gap:.75rem;font-weight:500;transition:all 0.2s ease">
+        <span style="font-size:1.25rem">👥</span>
+        <span>{{ t().nav.users }}</span>
+      </a>
+      <a routerLink="/admin/cashier-performance" routerLinkActive="active"
+         style="padding:.75rem 1rem;border-radius:10px;color:inherit;text-decoration:none;display:flex;align-items:center;gap:.75rem;font-weight:500;transition:all 0.2s ease">
+        <span style="font-size:1.25rem">📊</span>
+        <span>Performance</span>
       </a>
       <a routerLink="/admin/settings" routerLinkActive="active"
-         style="padding:.5rem 1rem;border-radius:8px;color:inherit;text-decoration:none">
-        Settings
+         style="padding:.75rem 1rem;border-radius:10px;color:inherit;text-decoration:none;display:flex;align-items:center;gap:.75rem;font-weight:500;transition:all 0.2s ease">
+        <span style="font-size:1.25rem">⚙️</span>
+        <span>{{ t().nav.settings }}</span>
       </a>
     </nav>
   </aside>
   <main style="flex:1;display:flex;flex-direction:column">
-    <header style="background:#fff;padding:1rem 1.5rem;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <h1 style="margin:0;font-size:1.25rem">Welcome back{{ user()?.email ? ', ' + user()?.email : '' }}</h1>
-        <p style="margin:0;color:#6b7280;font-size:.9rem">Choose a section on the left to manage the shop.</p>
+    <header class="admin-header" [class.dark]="isDarkMode()">
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div style="width:48px;height:48px;border-radius:50%;background:#8b5cf6;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.1rem">
+          {{ adminInitials() }}
+        </div>
+        <div>
+          <h1 class="header-title" [class.dark]="isDarkMode()" style="margin:0;font-size:1.1rem">{{ adminName() }}</h1>
+          <p class="header-subtitle" [class.dark]="isDarkMode()" style="margin:.125rem 0 0">{{ t().dashboard.manageShop }}</p>
+        </div>
       </div>
-      <button (click)="logout()" style="padding:.5rem 1rem">Logout</button>
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <!-- Switch to Cashier View -->
+        <a routerLink="/cashier/pos" style="padding:.625rem 1rem;background:#8b5cf6;color:white;font-weight:600;display:flex;align-items:center;gap:.5rem;font-size:.875rem;border-radius:8px;text-decoration:none;cursor:pointer">
+          <span style="font-size:1.1rem">💳</span>
+          <span>{{ t().nav.switchToCashier }}</span>
+        </a>
+        <!-- Language Switcher -->
+        <button
+          (click)="toggleLanguage()"
+          type="button"
+          style="padding:.625rem 1rem;background:#059669;color:white;font-weight:600;display:flex;align-items:center;gap:.5rem;font-size:.875rem;border-radius:8px;border:none;cursor:pointer"
+          title="Switch language">
+          <span style="font-size:1.1rem">🌐</span>
+          <span>{{ currentLang() === 'ge' ? 'GE' : 'EN' }}</span>
+        </button>
+        <!-- Dark Mode Toggle -->
+        <button
+          (click)="toggleDarkMode()"
+          type="button"
+          style="padding:.625rem 1rem;background:#6b7280;color:white;font-weight:600;display:flex;align-items:center;gap:.5rem;font-size:.875rem;border-radius:8px;border:none;cursor:pointer"
+          title="Toggle dark mode">
+          <span style="font-size:1.25rem">{{ isDarkMode() ? '☀️' : '🌙' }}</span>
+          <span>{{ t().theme[isDarkMode() ? 'light' : 'dark'] }}</span>
+        </button>
+        <!-- Logout Button -->
+        <button (click)="logout()" type="button" style="padding:.625rem 1.25rem;background:#ef4444;color:white;font-weight:600;font-size:.875rem;border-radius:8px;border:none;cursor:pointer">
+          {{ t().common.logout }}
+        </button>
+      </div>
     </header>
-    <section style="flex:1;padding:1.5rem;overflow:auto">
+    <section class="main-content" [class.dark]="isDarkMode()">
       <router-outlet></router-outlet>
     </section>
   </main>
 </div>
 
 <style>
-  a.active {
-    background: rgba(255,255,255,0.2);
-    font-weight: 600;
+  a {
+    &:hover {
+      background: rgba(59, 130, 246, 0.15);
+      transform: translateX(4px);
+    }
+
+    &.active {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
   }
 </style>

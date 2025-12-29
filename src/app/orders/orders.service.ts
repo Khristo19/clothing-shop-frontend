@@ -8,5 +8,6 @@ export class OrdersService {
   private readonly http = inject(HttpClient);
   private readonly BASE = `${environment.apiUrl}/sales`;
 
-  history() { return this.http.get<Sale[]>(`${this.BASE}/history.js`); }
+  history() { return this.http.get<Sale[]>(this.BASE); }
+  getById(id: number) { return this.http.get<Sale>(`${this.BASE}/${id}`); }
 }

@@ -1,46 +1,64 @@
 <!-- src/app/auth/login.html -->
-<div class="login-wrapper">
-  <form (ngSubmit)="onLogin()" #loginForm="ngForm" autocomplete="off">
-    <h2>Sign In</h2>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input
-        id="email"
-        name="email"
-        type="email"
-        required
-        email
-        [(ngModel)]="email"
-        #emailCtrl="ngModel"
-        [class.invalid]="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)"
-        autocomplete="username"
-      />
-      <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="error">
-        <span *ngIf="emailCtrl.errors?.['required']">Email is required.</span>
-        <span *ngIf="emailCtrl.errors?.['email']">Please enter a valid email address.</span>
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input
-        id="password"
-        name="password"
-        type="password"
-        required
-        [(ngModel)]="password"
-        #passwordCtrl="ngModel"
-        [class.invalid]="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)"
-        autocomplete="current-password"
-      />
-      <div *ngIf="passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)" class="error">
-        Password is required.
-      </div>
-    </div>
-    <button type="submit" [disabled]="loginForm.invalid || loading()">
-      {{ loading() ? 'Logging in...' : 'Log In' }}
+<div class="login-page" [class.dark]="isDarkMode()">
+  <div class="login-controls">
+    <!-- Language Switcher -->
+    <button
+      (click)="toggleLanguage()"
+      type="button"
+      class="control-btn"
+      title="Switch language">
+      <span style="font-size:1.1rem">🌐</span>
+      <span>{{ currentLang() === 'ge' ? 'GE' : 'EN' }}</span>
     </button>
-    <div *ngIf="error()" class="error-msg">
-      {{ error() }}
-    </div>
-  </form>
+    <!-- Dark Mode Toggle -->
+    <button
+      (click)="toggleDarkMode()"
+      type="button"
+      class="control-btn"
+      title="Toggle dark mode">
+      <span style="font-size:1.25rem">{{ isDarkMode() ? '☀️' : '🌙' }}</span>
+      <span>{{ t().theme[isDarkMode() ? 'light' : 'dark'] }}</span>
+    </button>
+  </div>
+  <div class="login-wrapper" [class.dark]="isDarkMode()">
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="off">
+      <h2>{{ t().login.signIn }}</h2>
+      <div class="form-group">
+        <label for="email">{{ t().login.email }}</label>
+        <input
+          id="email"
+          formControlName="email"
+          type="text"
+          (keydown)="preventSpace($event)"
+          [class.invalid]="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)"
+          autocomplete="username"
+        />
+        <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)" class="error">
+          <span *ngIf="loginForm.get('email')?.errors?.['required']">{{ t().login.emailRequired }}</span>
+          <span *ngIf="loginForm.get('email')?.errors?.['whitespace']">{{ t().login.emailWhitespace }}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password">{{ t().login.password }}</label>
+        <input
+          id="password"
+          formControlName="password"
+          type="password"
+          (keydown)="preventSpace($event)"
+          [class.invalid]="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)"
+          autocomplete="current-password"
+        />
+        <div *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)" class="error">
+          <span *ngIf="loginForm.get('password')?.errors?.['required']">{{ t().login.passwordRequired }}</span>
+          <span *ngIf="loginForm.get('password')?.errors?.['whitespace']">{{ t().login.passwordWhitespace }}</span>
+        </div>
+      </div>
+      <button type="submit" [disabled]="loginForm.invalid || loading()">
+        {{ loading() ? t().login.loggingIn : t().login.logIn }}
+      </button>
+      <div *ngIf="error()" class="error-msg">
+        {{ error() }}
+      </div>
+    </form>
+  </div>
 </div>

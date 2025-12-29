@@ -1,0 +1,145 @@
+<div style="display:flex;flex-direction:column;gap:1.5rem">
+  <header style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+    <div>
+      <h1 style="margin:0;font-size:1.5rem">{{ t().users.title }}</h1>
+      <p style="margin:0;color:#6b7280">{{ t().users.subtitle }}</p>
+    </div>
+    <button (click)="openCreateModal()" style="padding:.5rem 1rem;background:#3b82f6;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600">
+      {{ t().users.addUser }}
+    </button>
+  </header>
+
+  <section style="display:flex;gap:1rem;flex-wrap:wrap">
+    <div class="stat-card">
+      <p class="stat-label">{{ t().users.totalUsers }}</p>
+      <p class="stat-value">{{ users().length }}</p>
+    </div>
+  </section>
+
+  <section *ngIf="error()" class="alert alert-error">
+    {{ error() }}
+  </section>
+
+  <section *ngIf="loading()" class="alert alert-info">
+    {{ t().common.loading }}...
+  </section>
+
+  <div *ngIf="!loading() && users().length === 0" style="padding:1.5rem;border:1px dashed #d1d5db;border-radius:12px;text-align:center;color:#6b7280">
+    {{ t().users.noUsers }}
+  </div>
+
+  <!-- Users Table -->
+  <div *ngIf="!loading() && users().length > 0" style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden">
+      <thead style="background:#f9fafb">
+        <tr>
+          <th style="padding:.75rem;text-align:left;font-weight:600;color:#374151">{{ t().users.name }}</th>
+          <th style="padding:.75rem;text-align:left;font-weight:600;color:#374151">{{ t().users.surname }}</th>
+          <th style="padding:.75rem;text-align:left;font-weight:600;color:#374151">{{ t().users.email }}</th>
+          <th style="padding:.75rem;text-align:left;font-weight:600;color:#374151">{{ t().users.role }}</th>
+          <th style="padding:.75rem;text-align:left;font-weight:600;color:#374151">{{ t().users.createdAt }}</th>
+          <th style="padding:.75rem;text-align:left;font-weight:600;color:#374151">{{ t().users.actions }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users(); trackBy: trackById" style="border-top:1px solid #e5e7eb">
+          <td style="padding:.75rem">{{ user.name || '-' }}</td>
+          <td style="padding:.75rem">{{ user.surname || '-' }}</td>
+          <td style="padding:.75rem">{{ user.email }}</td>
+          <td style="padding:.75rem">
+            <span [style.background]="user.role === 'admin' ? '#dbeafe' : '#dcfce7'"
+                  [style.color]="user.role === 'admin' ? '#1e40af' : '#166534'"
+                  style="padding:.25rem .75rem;border-radius:999px;font-size:.875rem;font-weight:600">
+              {{ user.role === 'admin' ? t().users.admin : t().users.cashier }}
+            </span>
+          </td>
+          <td style="padding:.75rem">{{ user.created_at ? (user.created_at | date:'short') : '-' }}</td>
+          <td style="padding:.75rem">
+            <div style="display:flex;gap:.5rem">
+              <button (click)="openEditModal(user)" style="padding:.375rem .75rem;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;font-size:.875rem">
+                {{ t().common.edit }}
+              </button>
+              <button (click)="openDeleteModal(user)" style="padding:.375rem .75rem;background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;border-radius:6px;cursor:pointer;font-size:.875rem">
+                {{ t().common.delete }}
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create/Edit User Modal -->
+<div *ngIf="modalOpen()" style="position:fixed;inset:0;background:rgba(15,23,42,.35);display:flex;align-items:center;justify-content:center;z-index:50;padding:1rem">
+  <div style="background:#fff;padding:1.5rem;border-radius:16px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="margin:0;font-size:1.25rem">{{ editingUser() ? t().users.editUser : t().users.addUser }}</h3>
+      <button (click)="closeModal()" style="border:none;background:transparent;font-size:1.5rem;cursor:pointer;color:#6b7280">✕</button>
+    </div>
+
+    <form [formGroup]="userForm" (ngSubmit)="submitForm()" style="display:flex;flex-direction:column;gap:1rem">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <label style="display:flex;flex-direction:column;gap:.35rem">
+          <span style="font-weight:600;font-size:.875rem">{{ t().users.name }}</span>
+          <input formControlName="name" [placeholder]="t().users.namePlaceholder" style="padding:.5rem;border:1px solid #d1d5db;border-radius:6px" />
+        </label>
+        <label style="display:flex;flex-direction:column;gap:.35rem">
+          <span style="font-weight:600;font-size:.875rem">{{ t().users.surname }}</span>
+          <input formControlName="surname" [placeholder]="t().users.surnamePlaceholder" style="padding:.5rem;border:1px solid #d1d5db;border-radius:6px" />
+        </label>
+      </div>
+
+      <label style="display:flex;flex-direction:column;gap:.35rem">
+        <span style="font-weight:600;font-size:.875rem">{{ t().users.email }} *</span>
+        <input formControlName="email" type="email" [placeholder]="t().users.emailPlaceholder" style="padding:.5rem;border:1px solid #d1d5db;border-radius:6px" />
+        <span *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" style="color:#b91c1c;font-size:.75rem">
+          {{ t().users.emailRequired }}
+        </span>
+      </label>
+
+      <label *ngIf="!editingUser()" style="display:flex;flex-direction:column;gap:.35rem">
+        <span style="font-weight:600;font-size:.875rem">{{ t().users.password }} *</span>
+        <input formControlName="password" type="password" [placeholder]="t().users.passwordPlaceholder" style="padding:.5rem;border:1px solid #d1d5db;border-radius:6px" />
+        <span *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" style="color:#b91c1c;font-size:.75rem">
+          {{ t().users.passwordRequired }}
+        </span>
+      </label>
+
+      <label style="display:flex;flex-direction:column;gap:.35rem">
+        <span style="font-weight:600;font-size:.875rem">{{ t().users.role }} *</span>
+        <select formControlName="role" style="padding:.5rem;border:1px solid #d1d5db;border-radius:6px;background:#fff">
+          <option value="admin">{{ t().users.admin }}</option>
+          <option value="cashier">{{ t().users.cashier }}</option>
+        </select>
+      </label>
+
+      <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1rem">
+        <button type="button" (click)="closeModal()" style="padding:.6rem 1.1rem;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer">
+          {{ t().common.cancel }}
+        </button>
+        <button type="submit" [disabled]="submitting()" style="padding:.6rem 1.1rem;border:none;border-radius:8px;background:#3b82f6;color:#fff;font-weight:600;cursor:pointer">
+          {{ submitting() ? t().common.loading : (editingUser() ? t().users.updateUser : t().users.createUser) }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="deleteModalOpen()" style="position:fixed;inset:0;background:rgba(15,23,42,.35);display:flex;align-items:center;justify-content:center;z-index:50">
+  <div style="background:#fff;padding:1.5rem;border-radius:16px;max-width:420px;width:100%">
+    <h3 style="margin:0 0 1rem;font-size:1.25rem">{{ t().users.deleteConfirmTitle }}</h3>
+    <p style="margin:0 0 1.5rem;color:#6b7280">
+      {{ t().users.deleteConfirmMessage }} <strong>{{ userToDelete()?.email }}</strong>?
+    </p>
+    <div style="display:flex;justify-content:flex-end;gap:.75rem">
+      <button (click)="closeDeleteModal()" style="padding:.6rem 1.1rem;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer">
+        {{ t().common.cancel }}
+      </button>
+      <button (click)="confirmDelete()" [disabled]="submitting()" style="padding:.6rem 1.1rem;border:none;border-radius:8px;background:#dc2626;color:#fff;font-weight:600;cursor:pointer">
+        {{ submitting() ? t().common.loading : t().common.delete }}
+      </button>
+    </div>
+  </div>
+</div>

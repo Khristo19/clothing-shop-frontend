@@ -1,96 +1,130 @@
-<div style="display:flex;flex-direction:column;gap:1.5rem">
+<div [style.background]="isDarkMode() ? '#0f172a' : '#f9fafb'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" style="display:flex;flex-direction:column;gap:1.5rem;min-height:100vh;padding:1.5rem;transition:background 0.3s,color 0.3s">
   <header style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
     <div>
-      <h1 style="margin:0;font-size:1.5rem">Offers & Discounts</h1>
-      <p style="margin:0;color:#6b7280">Review cross-shop requests, approve discounts, or create a new offer.</p>
+      <h1 style="margin:0;font-size:1.5rem" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'">{{ t().offers.title }}</h1>
+      <p style="margin:0" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offers.subtitle }}</p>
     </div>
-    <button style="padding:.5rem 1rem" (click)="showCreate.set(true)">New offer</button>
+    <button (click)="showCreate.set(true)" [style.background]="isDarkMode() ? '#3b82f6' : '#111827'" [style.color]="'#fff'" style="padding:.5rem 1rem;border:none;border-radius:8px;cursor:pointer;font-weight:600">{{ t().offers.newOffer }}</button>
   </header>
 
   <section style="display:flex;gap:1rem;flex-wrap:wrap">
-    <div style="flex:1 1 160px;padding:1rem;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb">
-      <p style="margin:0;color:#6b7280;font-size:.875rem">Total offers</p>
-      <p style="margin:.25rem 0 0;font-size:1.5rem;font-weight:600">{{ totals().total }}</p>
+    <div [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.box-shadow]="isDarkMode() ? '0 10px 30px rgba(0,0,0,.3)' : '0 1px 3px rgba(0,0,0,0.1)'" style="flex:1;min-width:200px;padding:1.25rem;border-radius:12px;display:flex;flex-direction:column;gap:.5rem">
+      <p style="margin:0;font-size:.9rem;font-weight:500" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offers.totalOffers }}</p>
+      <p style="margin:0;font-size:2rem;font-weight:700" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'">{{ totals().total }}</p>
     </div>
-    <div style="flex:1 1 160px;padding:1rem;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb">
-      <p style="margin:0;color:#6b7280;font-size:.875rem">Pending approval</p>
-      <p style="margin:.25rem 0 0;font-size:1.5rem;font-weight:600">{{ totals().pending }}</p>
+    <div [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.box-shadow]="isDarkMode() ? '0 10px 30px rgba(0,0,0,.3)' : '0 1px 3px rgba(0,0,0,0.1)'" style="flex:1;min-width:200px;padding:1.25rem;border-radius:12px;display:flex;flex-direction:column;gap:.5rem">
+      <p style="margin:0;font-size:.9rem;font-weight:500" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offers.pendingApproval }}</p>
+      <p style="margin:0;font-size:2rem;font-weight:700" [style.color]="totals().pending > 0 ? '#ea580c' : (isDarkMode() ? '#e2e8f0' : '#111827')">{{ totals().pending }}</p>
     </div>
-    <div style="flex:1 1 160px;padding:1rem;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb">
-      <p style="margin:0;color:#6b7280;font-size:.875rem">Approved</p>
-      <p style="margin:.25rem 0 0;font-size:1.5rem;font-weight:600">{{ totals().approved }}</p>
+    <div [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.box-shadow]="isDarkMode() ? '0 10px 30px rgba(0,0,0,.3)' : '0 1px 3px rgba(0,0,0,0.1)'" style="flex:1;min-width:200px;padding:1.25rem;border-radius:12px;display:flex;flex-direction:column;gap:.5rem">
+      <p style="margin:0;font-size:.9rem;font-weight:500" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offers.approved }}</p>
+      <p style="margin:0;font-size:2rem;font-weight:700;color:#059669">{{ totals().approved }}</p>
     </div>
   </section>
 
-  <section *ngIf="error()" style="padding:.75rem;border-radius:8px;background:#fef2f2;color:#991b1b">
+  <section *ngIf="error()" [style.background]="isDarkMode() ? '#991b1b' : '#fee2e2'" [style.color]="isDarkMode() ? '#fca5a5' : '#991b1b'" style="padding:1rem;border-radius:12px">
     {{ error() }}
   </section>
-  <section *ngIf="loading()" style="padding:.75rem;border-radius:8px;background:#eff6ff;color:#1d4ed8">
-    Syncing offers from the backend...
+
+  <section *ngIf="loading()" [style.background]="isDarkMode() ? '#1e3a5f' : '#eff6ff'" [style.color]="isDarkMode() ? '#93c5fd' : '#1d4ed8'" style="padding:1rem;border-radius:12px">
+    {{ t().common.loading }}...
   </section>
 
-  <section *ngIf="showCreate()" style="border:1px solid #e5e7eb;padding:1rem;border-radius:12px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-      <h2 style="margin:0;font-size:1.25rem">Create offer</h2>
-      <button type="button" (click)="showCreate.set(false)" style="padding:.25rem .75rem">Close</button>
-    </div>
-    <form [formGroup]="form" (ngSubmit)="create()" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
-      <div style="display:flex;flex-direction:column;gap:.25rem;grid-column:1/-1">
-        <label>Requesting shop</label>
-        <input formControlName="from_shop" placeholder="Store A" />
-      </div>
-      <div style="display:flex;flex-direction:column;gap:.25rem;grid-column:1/-1">
-        <label>Items (JSON array)</label>
-        <textarea rows="3" formControlName="items" placeholder='[{"id":1,"qty":2}]'></textarea>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:.25rem;grid-column:1/-1">
-        <label>Requested discount (JSON)</label>
-        <textarea rows="3" formControlName="requested_discount" placeholder='{"type":"percentage","value":10}'></textarea>
-      </div>
-      <div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:.5rem">
-        <button type="button" (click)="showCreate.set(false)" style="padding:.5rem 1rem">Cancel</button>
-        <button type="submit" style="padding:.5rem 1rem" [disabled]="form.invalid || loading()">Submit request</button>
-      </div>
-    </form>
-  </section>
-
-  <div *ngIf="!loading() && offers().length === 0" style="padding:1.5rem;border:1px dashed #d1d5db;border-radius:12px;text-align:center;color:#6b7280">
-    No offers yet.
+  <div *ngIf="!loading() && offers().length === 0" [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.box-shadow]="isDarkMode() ? '0 10px 30px rgba(0,0,0,.3)' : '0 1px 3px rgba(0,0,0,0.1)'" [style.border]="isDarkMode() ? '1px dashed #334155' : '1px dashed #d1d5db'" style="padding:3rem 1.5rem;border-radius:12px;text-align:center">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" [attr.stroke]="isDarkMode() ? '#64748b' : '#d1d5db'" stroke-width="1.5" style="margin:0 auto 1rem">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+      <line x1="12" y1="18" x2="12" y2="12"></line>
+      <line x1="9" y1="15" x2="15" y2="15"></line>
+    </svg>
+    <h3 style="margin:0 0 .5rem" [style.color]="isDarkMode() ? '#e2e8f0' : '#374151'">{{ t().offers.noOffers }}</h3>
+    <p style="margin:0" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offers.subtitle }}</p>
   </div>
 
+  <!-- Offers List -->
   <div style="display:flex;flex-direction:column;gap:1rem">
-    <article *ngFor="let offer of offers(); trackBy: trackById" style="border:1px solid #e5e7eb;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:.75rem">
-      <header style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
-        <div>
-          <h3 style="margin:0;font-size:1.1rem">{{ offer.from_shop }}</h3>
-          <small style="color:#6b7280">Created {{ offer.created_at | date:'medium' }}</small>
+    <article *ngFor="let offer of offers(); trackBy: trackById" [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.box-shadow]="isDarkMode() ? '0 10px 30px rgba(0,0,0,.3)' : '0 1px 3px rgba(0,0,0,0.1)'" style="border-radius:12px;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;border-left:4px solid" [style.border-left-color]="getStatusColor(offer.status)">
+
+      <!-- Header -->
+      <header style="display:flex;justify-content:space-between;align-items:start;gap:1rem;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+            <h3 style="margin:0;font-size:1.1rem" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'">{{ offer.from_shop }}</h3>
+            <span [style.background]="getStatusBgColor(offer.status)" [style.color]="getStatusTextColor(offer.status)" style="padding:.25rem .75rem;border-radius:999px;font-size:.85rem;font-weight:600;text-transform:uppercase">
+              {{ offer.status }}
+            </span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:.25rem">
+            <div style="display:flex;align-items:center;gap:.5rem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" [attr.stroke]="isDarkMode() ? '#94a3b8' : '#6b7280'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <small [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">
+                <span style="font-weight:500">{{ t().orders.cashier }}:</span>
+                <span [title]="offer.cashier_email || ''">{{ getCashierDisplay(offer) }}</span>
+              </small>
+            </div>
+            <div style="display:flex;align-items:center;gap:.5rem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" [attr.stroke]="isDarkMode() ? '#94a3b8' : '#6b7280'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <small [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offersStatus.submitted }} {{ formatDate(offer.created_at) }}</small>
+            </div>
+          </div>
         </div>
-        <span [ngStyle]="{
-          'background-color': offer.status === 'approved' ? '#dcfce7' : offer.status === 'rejected' ? '#fee2e2' : '#fef9c3',
-          'color': offer.status === 'approved' ? '#166534' : offer.status === 'rejected' ? '#991b1b' : '#854d0e',
-          'padding': '0.25rem 0.75rem',
-          'border-radius': '999px',
-          'font-weight': '500'
-        }">
-          {{ offer.status | titlecase }}
-        </span>
       </header>
 
-      <section style="display:flex;flex-direction:column;gap:.5rem">
-        <strong>Items requested</strong>
-        <ul style="margin:0;padding-left:1.25rem;display:flex;flex-direction:column;gap:.25rem">
-          <li *ngFor="let item of offer.items">{{ item.name || ('Item #' + item.id) }} &middot; Qty {{ item.qty }}</li>
-        </ul>
+      <!-- Items -->
+      <section style="display:flex;flex-direction:column;gap:.75rem">
+        <h4 style="margin:0;font-size:.95rem;font-weight:600" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offersStatus.items }}:</h4>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <div *ngFor="let item of offer.items" [style.background]="isDarkMode() ? '#0f172a' : '#f9fafb'" style="padding:.75rem 1rem;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;flex-direction:column;gap:.125rem">
+              <span [style.color]="isDarkMode() ? '#e2e8f0' : '#374151'" style="font-weight:600">{{ item.name || ('Item #' + item.id) }}</span>
+              <span [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'" style="font-size:.85rem">{{ t().offersStatus.submitted.split(':')[0] }}: {{ item.qty }}x</span>
+            </div>
+            <span *ngIf="item.price" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" style="font-weight:600">₾{{ item.price | number:'1.2-2' }}</span>
+          </div>
+        </div>
       </section>
 
-      <section *ngIf="offer.requested_discount" style="display:flex;flex-direction:column;gap:.25rem">
-        <strong>Discount details</strong>
-        <code style="background:#f3f4f6;padding:.5rem;border-radius:8px;word-break:break-all;font-size:.85rem">{{ offer.requested_discount | json }}</code>
+      <!-- Discount Details -->
+      <section *ngIf="offer.requested_discount" [style.background]="isDarkMode() ? '#0f172a' : '#f9fafb'" style="padding:1rem;border-radius:8px;display:flex;flex-direction:column;gap:.5rem">
+        <h4 style="margin:0;font-size:.95rem;font-weight:600" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offersStatus.discountType }}:</h4>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.25rem">
+          <span [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offersStatus.discountType }}</span>
+          <span [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" style="font-weight:600">{{ offer.requested_discount.type === 'percentage' ? t().pos.percentage : t().offersStatus.fixedAmount }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.25rem">
+          <span [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offersStatus.discountValue }}</span>
+          <span [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" style="font-weight:600">{{ offer.requested_discount.type === 'percentage' ? offer.requested_discount.value + '%' : '₾' + offer.requested_discount.value }}</span>
+        </div>
+        <div *ngIf="offer.requested_discount.cart_total" style="display:flex;justify-content:space-between;margin-bottom:.25rem">
+          <span [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offersStatus.cartTotal }}</span>
+          <span [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" style="font-weight:600">₾{{ offer.requested_discount.cart_total | number:'1.2-2' }}</span>
+        </div>
+        <div *ngIf="offer.payment_method" style="display:flex;justify-content:space-between;margin-bottom:.25rem">
+          <span [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().offersStatus.paymentMethod }}</span>
+          <span [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" style="font-weight:600">{{ formatPaymentMethod(offer.payment_method) }}</span>
+        </div>
+        <div *ngIf="offer.requested_discount.notes" [style.border-top]="isDarkMode() ? '1px solid #334155' : '1px solid #e5e7eb'" style="margin-top:.5rem;padding-top:.5rem">
+          <span [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'" style="font-size:.9rem">{{ t().offersStatus.note }} </span>
+          <span [style.color]="isDarkMode() ? '#e2e8f0' : '#374151'">{{ offer.requested_discount.notes }}</span>
+        </div>
       </section>
 
-      <footer style="display:flex;justify-content:flex-end;gap:.5rem" *ngIf="offer.status === 'pending'">
-        <button style="padding:.5rem 1rem" (click)="updateStatus(offer.id, 'rejected')" [disabled]="loading()">Reject</button>
-        <button style="padding:.5rem 1rem" (click)="updateStatus(offer.id, 'approved')" [disabled]="loading()">Approve</button>
+      <!-- Actions -->
+      <footer style="display:flex;justify-content:flex-end;gap:.75rem" *ngIf="offer.status === 'pending'">
+        <button (click)="updateStatus(offer.id, 'rejected')" [disabled]="loading()" [style.background]="isDarkMode() ? '#7f1d1d' : '#fee2e2'" [style.color]="isDarkMode() ? '#fca5a5' : '#991b1b'" style="padding:.625rem 1.25rem;border:none;border-radius:8px;cursor:pointer;font-weight:600">
+          {{ t().offers.reject }}
+        </button>
+        <button (click)="updateStatus(offer.id, 'approved')" [disabled]="loading()" [style.background]="isDarkMode() ? '#065f46' : '#d1fae5'" [style.color]="isDarkMode() ? '#6ee7b7' : '#065f46'" style="padding:.625rem 1.25rem;border:none;border-radius:8px;cursor:pointer;font-weight:600">
+          {{ t().offers.approve }}
+        </button>
       </footer>
     </article>
   </div>

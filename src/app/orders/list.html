@@ -1,64 +1,249 @@
-<div style="display:flex;flex-direction:column;gap:1.5rem">
-  <header style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+<div style="display:flex;flex-direction:column;gap:2rem;padding:0.5rem">
+  <!-- Header Section -->
+  <header style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap">
     <div>
-      <h1 style="margin:0;font-size:1.5rem">Sales History</h1>
-      <p style="margin:0;color:#6b7280">Track recent orders, payment methods, and totals.</p>
+      <h1 style="margin:0;font-size:1.75rem;font-weight:700;color:#111827">{{ t().orders.title }}</h1>
+      <p style="margin:0.375rem 0 0;color:#6b7280;font-size:0.95rem">{{ t().orders.subtitle }}</p>
     </div>
-    <button style="padding:.5rem 1rem" (click)="load()">Refresh</button>
+    <button
+      (click)="load()"
+      style="padding:0.625rem 1.25rem;display:flex;align-items:center;gap:0.5rem;font-weight:500;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s"
+      [style.opacity]="loading() ? '0.6' : '1'"
+    >
+      <span style="font-size:1.1rem">🔄</span>
+      {{ t().common.refresh }}
+    </button>
   </header>
 
-  <section style="display:flex;gap:1rem;flex-wrap:wrap">
-    <div style="flex:1 1 160px;padding:1rem;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb">
-      <p style="margin:0;color:#6b7280;font-size:.875rem">Orders recorded</p>
-      <p style="margin:.25rem 0 0;font-size:1.5rem;font-weight:600">{{ orders().length }}</p>
+  <!-- Stats Cards -->
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem">
+    <!-- Total Orders Card -->
+    <div class="stat-card" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border:none;color:white;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:5rem;opacity:0.15">📋</div>
+      <p style="margin:0;font-size:0.875rem;font-weight:500;opacity:0.9;text-transform:uppercase;letter-spacing:0.05em">{{ t().orders.ordersRecorded }}</p>
+      <p style="margin:0.5rem 0 0;font-size:2.5rem;font-weight:700">{{ orders().length }}</p>
     </div>
-    <div style="flex:1 1 160px;padding:1rem;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb">
-      <p style="margin:0;color:#6b7280;font-size:.875rem">Total revenue</p>
-      <p style="margin:.25rem 0 0;font-size:1.5rem;font-weight:600">${{ totalRevenue() | number:'1.2-2' }}</p>
+
+    <!-- Total Revenue Card -->
+    <div class="stat-card" style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);border:none;color:white;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:5rem;opacity:0.15">💰</div>
+      <p style="margin:0;font-size:0.875rem;font-weight:500;opacity:0.9;text-transform:uppercase;letter-spacing:0.05em">{{ t().orders.totalRevenue }}</p>
+      <p style="margin:0.5rem 0 0;font-size:2.5rem;font-weight:700">{{ currency() }}{{ totalRevenue() | number:'1.2-2' }}</p>
     </div>
-    <div *ngIf="latestOrder()" style="flex:1 1 160px;padding:1rem;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb">
-      <p style="margin:0;color:#6b7280;font-size:.875rem">Last order</p>
-      <p style="margin:.25rem 0 0;font-size:1rem">{{ latestOrder() | date:'medium' }}</p>
+
+    <!-- Last Order Card -->
+    <div *ngIf="latestOrder()" class="stat-card" style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);border:none;color:white;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:5rem;opacity:0.15">🕒</div>
+      <p style="margin:0;font-size:0.875rem;font-weight:500;opacity:0.9;text-transform:uppercase;letter-spacing:0.05em">{{ t().orders.lastOrder }}</p>
+      <p style="margin:0.5rem 0 0;font-size:1.1rem;font-weight:600">{{ latestOrder() | date:'short' }}</p>
     </div>
   </section>
 
-  <section *ngIf="error()" style="padding:.75rem;border-radius:8px;background:#fef2f2;color:#991b1b">
+  <!-- Filters Section -->
+  <section style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:1.25rem;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem">
+      <span style="font-size:1.25rem">🔍</span>
+      <h3 style="margin:0;font-size:1.1rem;font-weight:600;color:#111827">Filters</h3>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;align-items:end">
+      <div style="display:flex;flex-direction:column;gap:0.5rem">
+        <label style="font-weight:600;font-size:0.875rem;color:#374151">📍 Location</label>
+        <select [(ngModel)]="filterLocationId" style="padding:0.5rem 0.75rem;border:1px solid #d1d5db;border-radius:8px;font-size:0.875rem;cursor:pointer">
+          <option [ngValue]="null">All Locations</option>
+          <option *ngFor="let loc of locations()" [ngValue]="loc.id">{{ loc.name }}</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem">
+        <label style="font-weight:600;font-size:0.875rem;color:#374151">👤 Served By</label>
+        <select [(ngModel)]="filterServedByCashierId" style="padding:0.5rem 0.75rem;border:1px solid #d1d5db;border-radius:8px;font-size:0.875rem;cursor:pointer">
+          <option [ngValue]="null">All Cashiers</option>
+          <option *ngFor="let cashier of cashiers()" [ngValue]="cashier.id">{{ cashier.email }}</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem">
+        <label style="font-weight:600;font-size:0.875rem;color:#374151">🤝 Partner</label>
+        <select [(ngModel)]="filterPartnerCashierId" style="padding:0.5rem 0.75rem;border:1px solid #d1d5db;border-radius:8px;font-size:0.875rem;cursor:pointer">
+          <option [ngValue]="null">All</option>
+          <option value="null">No Partner</option>
+          <option *ngFor="let cashier of cashiers()" [ngValue]="cashier.id">{{ cashier.email }}</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:0.5rem">
+        <button (click)="applyFilters()" style="padding:0.5rem 1rem;background:#3b82f6;color:white;border:none;border-radius:8px;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.2s">
+          Apply
+        </button>
+        <button (click)="clearFilters()" style="padding:0.5rem 1rem;background:#6b7280;color:white;border:none;border-radius:8px;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.2s">
+          Clear
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Error/Loading States -->
+  <section *ngIf="error()" class="alert alert-error" style="animation:slideIn 0.3s ease">
+    <span style="font-size:1.25rem;margin-right:0.5rem">⚠️</span>
     {{ error() }}
   </section>
-  <section *ngIf="loading()" style="padding:.75rem;border-radius:8px;background:#eff6ff;color:#1d4ed8">
-    Loading recent orders...
+
+  <section *ngIf="loading()" class="alert alert-info" style="animation:slideIn 0.3s ease">
+    <span style="font-size:1.25rem;margin-right:0.5rem;display:inline-block;animation:spin 1s linear infinite">⏳</span>
+    {{ t().common.loading }}...
   </section>
 
-  <div *ngIf="!loading() && orders().length === 0" style="padding:1.5rem;border:1px dashed #d1d5db;border-radius:12px;text-align:center;color:#6b7280">
-    No orders were found.
+  <!-- Empty State -->
+  <div
+    *ngIf="!loading() && orders().length === 0"
+    style="padding:3rem 1.5rem;border:2px dashed #d1d5db;border-radius:16px;text-align:center;background:#f9fafb"
+  >
+    <div style="font-size:4rem;margin-bottom:1rem;opacity:0.4">📦</div>
+    <p style="margin:0;color:#6b7280;font-size:1.1rem;font-weight:500">{{ t().orders.noOrders }}</p>
   </div>
 
-  <div style="display:flex;flex-direction:column;gap:1rem">
-    <article *ngFor="let order of orders(); trackBy: trackById" style="border:1px solid #e5e7eb;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:.75rem">
-      <header style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
-        <div>
-          <h3 style="margin:0;font-size:1.1rem">Order #{{ order.id }}</h3>
-          <small style="color:#6b7280">Placed {{ order.created_at | date:'medium' }}</small>
+  <!-- Orders List -->
+  <div style="display:flex;flex-direction:column;gap:1.25rem">
+    <article
+      *ngFor="let order of orders(); trackBy: trackById"
+      style="border:1px solid #e5e7eb;border-radius:16px;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.05);transition:all 0.3s ease;overflow:hidden"
+      [style.box-shadow]="isExpanded(order.id) ? '0 8px 24px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.05)'"
+    >
+      <!-- Order Header (Always Visible) -->
+      <header
+        (click)="toggleOrderDetails(order.id)"
+        style="padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;cursor:pointer;transition:background 0.2s;flex-wrap:wrap"
+        [style.background]="isExpanded(order.id) ? '#f9fafb' : 'white'"
+      >
+        <div style="display:flex;align-items:center;gap:1rem;flex:1;min-width:200px">
+          <!-- Order Icon -->
+          <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">
+            📋
+          </div>
+
+          <!-- Order Info -->
+          <div style="flex:1">
+            <h3 style="margin:0;font-size:1.15rem;font-weight:600;color:#111827">
+              {{ t().orders.orderNumber }}{{ order.id }}
+            </h3>
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.25rem;flex-wrap:wrap">
+              <small style="color:#6b7280;font-size:0.875rem;display:flex;align-items:center;gap:0.25rem">
+                <span>🕒</span>
+                {{ order.created_at | date:'medium' }}
+              </small>
+              <small *ngIf="order.location_name" style="color:#6b7280;font-size:0.875rem;display:flex;align-items:center;gap:0.25rem">
+                <span>📍</span>
+                {{ getLocationName(order.location_name) }}
+              </small>
+              <small *ngIf="order.served_by_email" style="color:#6b7280;font-size:0.875rem;display:flex;align-items:center;gap:0.25rem">
+                <span>👤</span>
+                {{ getCashierDisplay(order.served_by_email, order.served_by_name, order.served_by_surname) }}
+              </small>
+              <small *ngIf="order.partner_email" style="color:#6b7280;font-size:0.875rem;display:flex;align-items:center;gap:0.25rem">
+                <span>🤝</span>
+                {{ getCashierDisplay(order.partner_email, order.partner_name, order.partner_surname) }}
+              </small>
+            </div>
+          </div>
         </div>
-        <span style="padding:.25rem .75rem;border-radius:999px;background:#eef2ff;color:#1e3a8a;font-weight:500;text-transform:capitalize">
-          {{ order.payment_method }}
-        </span>
+
+        <!-- Order Summary -->
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+          <!-- Payment Method Badge -->
+          <div style="padding:0.5rem 1rem;border-radius:8px;background:#eff6ff;color:#1e40af;font-weight:600;font-size:0.875rem;display:flex;align-items:center;gap:0.5rem">
+            <span>{{ getPaymentMethodIcon(order.payment_method) }}</span>
+            <span>{{ getPaymentMethodLabel(order.payment_method) }}</span>
+          </div>
+
+          <!-- Total Amount -->
+          <div style="text-align:right">
+            <div style="font-size:0.75rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.125rem">{{ t().orders.total }}</div>
+            <div style="font-size:1.5rem;font-weight:700;color:#059669">{{ currency() }}{{ order.total | number:'1.2-2' }}</div>
+          </div>
+
+          <!-- Expand/Collapse Icon -->
+          <div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:transform 0.3s" [style.transform]="isExpanded(order.id) ? 'rotate(180deg)' : 'rotate(0)'">
+            <span style="font-size:1.25rem">▼</span>
+          </div>
+        </div>
       </header>
 
-      <section style="display:flex;flex-direction:column;gap:.25rem">
-        <strong>Items</strong>
-        <ul style="margin:0;padding-left:1.25rem;display:flex;flex-direction:column;gap:.25rem">
-          <li *ngFor="let item of order.items">
-            {{ item.name || ('Item #' + item.id) }}  &middot; Qty {{ item.qty }}<span *ngIf="item.price">  &middot; ${{ item.price | number:'1.2-2' }}</span>
-          </li>
-        </ul>
-      </section>
+      <!-- Order Details (Expandable) -->
+      <div
+        *ngIf="isExpanded(order.id)"
+        style="border-top:1px solid #e5e7eb;padding:1.5rem;background:#fafafa;animation:slideDown 0.3s ease"
+      >
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <!-- Items Header -->
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem">
+            <span style="font-size:1.25rem">🛍️</span>
+            <strong style="font-size:1.05rem;color:#111827">{{ t().orders.items }} ({{ order.items.length }})</strong>
+          </div>
 
-      <footer style="display:flex;justify-content:flex-end;gap:1rem;align-items:center">
-        <span style="font-weight:600;font-size:1.1rem">Total ${{ order.total | number:'1.2-2' }}</span>
-        <span style="color:#6b7280">Cashier: {{ order.cashier_email || 'N/A' }}</span>
-      </footer>
+          <!-- Items List -->
+          <div style="display:grid;gap:0.75rem">
+            <div
+              *ngFor="let item of order.items;let i = index"
+              style="padding:1rem;background:white;border-radius:12px;border:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;gap:1rem;transition:all 0.2s"
+              [style.animation]="'slideIn 0.3s ease ' + (i * 0.1) + 's backwards'"
+            >
+              <div style="flex:1">
+                <div style="font-weight:600;color:#111827;margin-bottom:0.25rem">
+                  {{ item.name || ('Item #' + item.id) }}
+                </div>
+                <div style="font-size:0.875rem;color:#6b7280">
+                  <span style="background:#f3f4f6;padding:0.25rem 0.5rem;border-radius:6px;margin-right:0.5rem">Qty: {{ item.qty }}</span>
+                  <span *ngIf="item.price">{{ currency() }}{{ item.price | number:'1.2-2' }} each</span>
+                </div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:1.1rem;font-weight:700;color:#111827">
+                  {{ currency() }}{{ (item.price || 0) * item.qty | number:'1.2-2' }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Total Summary -->
+          <div style="margin-top:1rem;padding-top:1rem;border-top:2px solid #e5e7eb">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:1.1rem;font-weight:600;color:#6b7280">{{ t().orders.total }}</span>
+              <span style="font-size:1.75rem;font-weight:700;color:#059669">{{ currency() }}{{ order.total | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </article>
   </div>
 </div>
 
+<!-- Keyframes for animations -->
+<style>
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+    }
+    to {
+      opacity: 1;
+      max-height: 2000px;
+    }
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  article:hover {
+    border-color: #cbd5e1 !important;
+  }
+</style>

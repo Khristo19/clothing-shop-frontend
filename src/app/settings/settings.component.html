@@ -1,8 +1,147 @@
-<h2>Settings</h2>
-<form [formGroup]="form" style="max-width:500px">
-  <label>Tax %<input type="number" formControlName="tax" /></label>
-  <label style="display:block;margin-top:.5rem">Currency<input formControlName="currency" /></label>
-  <div style="margin-top:.75rem"><button type="button" (click)="save()">Save</button></div>
-</form>
+<div style="display:flex;flex-direction:column;gap:1.5rem;max-width:700px">
+  <header>
+    <h1 style="margin:0;font-size:1.5rem;font-weight:700">{{ t().settings.title }}</h1>
+    <p style="margin:.25rem 0 0;color:#6b7280">{{ t().settings.subtitle }}</p>
+  </header>
+
+  @if (saveMessage()) {
+    <div
+      [class.alert-success]="saveMessage()!.type === 'success'"
+      [class.alert-error]="saveMessage()!.type === 'error'"
+      class="alert"
+      style="padding:1rem;border-radius:8px;font-weight:500"
+    >
+      {{ saveMessage()!.text }}
+    </div>
+  }
+
+  <div style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:2rem;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+    <h2 style="margin:0 0 1.5rem;font-size:1.25rem;font-weight:600;color:#111827;padding-bottom:1rem;border-bottom:1px solid #e5e7eb">
+      {{ t().settings.generalConfig }}
+    </h2>
+
+    <form [formGroup]="form" style="display:flex;flex-direction:column;gap:1.5rem">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label style="font-size:.875rem;font-weight:600;color:#374151">
+            {{ t().settings.taxRate }}
+          </label>
+          <input
+            type="number"
+            formControlName="tax"
+            placeholder="0.00"
+            step="0.01"
+            style="padding:.75rem 1rem;border:1px solid #d1d5db;border-radius:8px;font-size:.875rem"
+          />
+          <p style="margin:0;font-size:.75rem;color:#6b7280">{{ t().settings.taxHelper }}</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label style="font-size:.875rem;font-weight:600;color:#374151">
+            {{ t().settings.currency }}
+          </label>
+          <input
+            formControlName="currency"
+            placeholder="GEL"
+            style="padding:.75rem 1rem;border:1px solid #d1d5db;border-radius:8px;font-size:.875rem"
+          />
+          <p style="margin:0;font-size:.75rem;color:#6b7280">{{ t().settings.currencyHelper }}</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label style="font-size:.875rem;font-weight:600;color:#374151">
+            {{ t().settings.lowStockThreshold || 'Low Stock Threshold' }}
+          </label>
+          <input
+            type="number"
+            formControlName="low_stock_threshold"
+            placeholder="5"
+            min="1"
+            style="padding:.75rem 1rem;border:1px solid #d1d5db;border-radius:8px;font-size:.875rem"
+            [style.border-color]="form.get('low_stock_threshold')?.invalid && form.get('low_stock_threshold')?.touched ? '#ef4444' : '#d1d5db'"
+          />
+          <p style="margin:0;font-size:.75rem;color:#6b7280">{{ t().settings.lowStockHelper || 'Items below this quantity will be marked as low stock (minimum: 1)' }}</p>
+          <p *ngIf="form.get('low_stock_threshold')?.invalid && form.get('low_stock_threshold')?.touched" style="margin:0;font-size:.75rem;color:#ef4444">
+            Minimum value is 1
+          </p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:.75rem;padding-top:1rem;border-top:1px solid #e5e7eb">
+        <button type="submit" (click)="save()" style="padding:.75rem 1.5rem;font-weight:600">
+          {{ t().settings.saveChanges }}
+        </button>
+        <button type="button" style="padding:.75rem 1.5rem">
+          {{ t().settings.resetDefaults }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Locations Section -->
+  <div style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:2rem;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e5e7eb">
+      <h2 style="margin:0;font-size:1.25rem;font-weight:600;color:#111827">
+        📍 Locations
+      </h2>
+      <button type="button" (click)="openLocationForm()" style="padding:.5rem 1rem;background:#10b981;font-size:.875rem">
+        + Add Location
+      </button>
+    </div>
+
+    <!-- Location Form -->
+    <div *ngIf="showLocationForm()" style="margin-bottom:1.5rem;padding:1rem;background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb">
+      <h3 style="margin:0 0 1rem;font-size:1rem;font-weight:600">{{ editingLocation() ? 'Edit Location' : 'New Location' }}</h3>
+      <form [formGroup]="locationForm" (ngSubmit)="saveLocation()" style="display:flex;gap:1rem;align-items:flex-start">
+        <div style="flex:1">
+          <input
+            formControlName="name"
+            placeholder="Location name (e.g., Downtown Store)"
+            style="width:100%;padding:.75rem;border:1px solid #d1d5db;border-radius:8px"
+            [style.border-color]="locationForm.get('name')?.invalid && locationForm.get('name')?.touched ? '#ef4444' : '#d1d5db'"
+          />
+          <p *ngIf="locationForm.get('name')?.invalid && locationForm.get('name')?.touched" style="margin:0.25rem 0 0;font-size:.75rem;color:#ef4444">
+            Name is required (min 2 characters)
+          </p>
+        </div>
+        <button type="submit" style="padding:.75rem 1.5rem;background:#3b82f6">Save</button>
+        <button type="button" (click)="closeLocationForm()" style="padding:.75rem 1.5rem;background:#6b7280">Cancel</button>
+      </form>
+    </div>
+
+    <!-- Locations List -->
+    <div *ngIf="locations().length === 0 && !showLocationForm()" style="padding:2rem;text-align:center;color:#6b7280;border:1px dashed #d1d5db;border-radius:8px">
+      No locations configured. Click "Add Location" to get started.
+    </div>
+
+    <div *ngIf="locations().length > 0" style="display:grid;gap:0.75rem">
+      <div *ngFor="let location of locations()" style="display:flex;justify-content:space-between;align-items:center;padding:1rem;background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb">
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <span style="font-size:1.5rem">🏪</span>
+          <div>
+            <div style="font-weight:600;color:#111827">{{ location.name }}</div>
+            <div style="font-size:0.75rem;color:#6b7280">ID: {{ location.id }}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem">
+          <button type="button" (click)="openLocationForm(location)" style="padding:.5rem 1rem;background:#3b82f6;font-size:.875rem">
+            Edit
+          </button>
+          <button type="button" (click)="deleteLocation(location)" style="padding:.5rem 1rem;background:#ef4444;font-size:.875rem">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:1.25rem;display:flex;gap:1rem">
+    <span style="font-size:1.5rem">ℹ️</span>
+    <div>
+      <h3 style="margin:0 0 .25rem;font-size:.875rem;font-weight:600;color:#1e40af">{{ t().settings.infoTitle }}</h3>
+      <p style="margin:0;font-size:.875rem;color:#1e40af">{{ t().settings.infoMessage }}</p>
+    </div>
+  </div>
+</div>
 
 

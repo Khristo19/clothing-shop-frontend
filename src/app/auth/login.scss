@@ -1,37 +1,132 @@
 // src/app/auth/login.scss
+.login-page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  transition: background 0.3s ease;
+
+  &.dark {
+    background: #0f172a;
+  }
+}
+
+.login-controls {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  z-index: 10;
+}
+
+.control-btn {
+  padding: 0.5rem 1rem;
+  background: #059669;
+  color: white;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #047857;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
 .login-wrapper {
   max-width: 350px;
-  margin: 5rem auto;
+  margin: 0 auto;
   padding: 2rem 2.5rem;
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 2px 18px #0002;
+  box-shadow: 0 2px 18px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
+  position: relative;
+  top: 5rem;
+
+  &.dark {
+    background: #1e293b;
+    color: #e2e8f0;
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.5);
+
+    h2 {
+      color: #e2e8f0;
+    }
+
+    label {
+      color: #e2e8f0;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"] {
+      background: #0f172a;
+      border-color: #334155;
+      color: #e2e8f0;
+
+      &::placeholder {
+        color: #64748b;
+      }
+
+      &:focus {
+        border-color: #60a5fa;
+      }
+    }
+
+    button[type="submit"] {
+      background: #3b82f6;
+
+      &:hover:not(:disabled) {
+        background: #2563eb;
+      }
+
+      &:disabled {
+        background: #475569;
+      }
+    }
+  }
 }
+
 h2 {
   text-align: center;
   margin-bottom: 1.5rem;
 }
+
 .form-group {
   margin-bottom: 1.25rem;
 }
+
 label {
   display: block;
   margin-bottom: 0.35rem;
   font-weight: bold;
 }
-input[type="email"], input[type="password"] {
+
+input[type="text"], input[type="email"], input[type="password"] {
   width: 100%;
   padding: 0.6rem 0.7rem;
   border-radius: 5px;
   border: 1px solid #aaa;
   font-size: 1rem;
   outline: none;
-  transition: border-color .2s;
+  transition: all 0.2s;
+
+  &:focus {
+    border-color: #5935e7;
+  }
 }
+
 input.invalid {
   border-color: #e05b5b;
 }
+
 button[type="submit"] {
   width: 100%;
   padding: 0.65rem;
@@ -43,12 +138,18 @@ button[type="submit"] {
   font-weight: 500;
   cursor: pointer;
   margin-top: 0.5rem;
-  transition: background .2s;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #4528b8;
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
 }
-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
+
 .error, .error-msg {
   color: #e05b5b;
   font-size: 0.95rem;

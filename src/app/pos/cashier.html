@@ -1,164 +1,191 @@
-<div style="padding:1.75rem;display:flex;flex-direction:column;gap:1.5rem;background:#f9fafb;min-height:100vh">
-  <header>
-    <h1 style="margin:0;font-size:1.75rem;">Point of Sale</h1>
-    <p style="margin:.25rem 0 0;color:#6b7280;max-width:520px">
-      Scan a barcode or browse the catalog. Confirm stock levels and product photos with the customer before adding items to the cart.
-    </p>
-  </header>
+<div [class.dark]="isDarkMode()" [style.background]="isDarkMode() ? '#0f172a' : '#f9fafb'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" style="padding:1.75rem;display:flex;flex-direction:column;gap:1.5rem;transition:background 0.3s,color 0.3s">
 
-  <section *ngIf="banner() as toast" [style.background]="toast.tone === 'error' ? '#fee2e2' : '#dcfce7'" style="padding:.75rem 1rem;border-radius:10px;display:flex;align-items:center;justify-content:space-between;color:#111827">
+  <section *ngIf="banner() as toast" [style.background]="toast.tone === 'error' ? (isDarkMode() ? '#991b1b' : '#fee2e2') : (isDarkMode() ? '#065f46' : '#dcfce7')" [style.color]="isDarkMode() ? '#fff' : '#111827'" [style.border]="toast.tone === 'error' ? (isDarkMode() ? '1px solid #dc2626' : '1px solid #fca5a5') : (isDarkMode() ? '1px solid #10b981' : '1px solid #86efac')" style="padding:.75rem 1rem;border-radius:10px;display:flex;align-items:center;justify-content:space-between">
     <span>{{ toast.text }}</span>
-    <button (click)="banner.set(null)" style="background:transparent;border:none;color:inherit;font-weight:600;cursor:pointer">�</button>
+    <button (click)="banner.set(null)" style="background:transparent;border:none;color:inherit;font-weight:600;cursor:pointer">✕</button>
   </section>
 
   <div style="display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));align-items:flex-start">
-    <section style="background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 10px 30px rgba(15,23,42,.08);display:flex;flex-direction:column;gap:1rem">
+    <section [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.box-shadow]="isDarkMode() ? '0 10px 30px rgba(0,0,0,.3)' : '0 10px 30px rgba(15,23,42,.08)'" style="border-radius:16px;padding:1.25rem;display:flex;flex-direction:column;gap:1rem">
       <div>
-        <h2 style="margin:0;font-size:1.25rem">Inventory</h2>
-        <p style="margin:.25rem 0 0;color:#6b7280;font-size:.9rem">Browse the catalog or search, then tap an item to add it to the cart.</p>
+        <h2 style="margin:0;font-size:1.25rem">{{ t().pos.inventory }}</h2>
+        <p style="margin:.25rem 0 0;font-size:.9rem" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ t().pos.inventorySubtitle }}</p>
       </div>
-      <button (click)="togglePicker()" style="align-self:flex-start;padding:.5rem 1rem;border-radius:8px;border:1px solid #d1d5db;background:#fff;cursor:pointer">
-        {{ pickerOpen() ? 'Hide product list' : 'Browse catalog' }}
+      <button (click)="togglePicker()" [style.background]="isDarkMode() ? '#0f172a' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="align-self:flex-start;padding:.5rem 1rem;border-radius:8px;cursor:pointer">
+        {{ pickerOpen() ? t().pos.hideProductList : t().pos.browseCatalog }}
       </button>
 
       <div *ngIf="pickerOpen()" style="display:flex;flex-direction:column;gap:1rem">
         <div>
-          <input [value]="search()" (input)="search.set(($any($event.target)).value)" placeholder="Search by name or description" style="width:100%;padding:.6rem 1rem;border-radius:10px;border:1px solid #d1d5db" />
+          <input [value]="search()" (input)="search.set(($any($event.target)).value)" [placeholder]="t().pos.searchPlaceholder" [style.background]="isDarkMode() ? '#0f172a' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="width:100%;padding:.6rem 1rem;border-radius:10px" />
         </div>
 
-        <div *ngIf="loadingProducts()" style="padding:1rem;border-radius:10px;background:#eff6ff;color:#1d4ed8">Loading catalog�</div>
-        <div *ngIf="productError()" style="padding:1rem;border-radius:10px;background:#fef2f2;color:#991b1b">{{ productError() }}</div>
+        <div *ngIf="loadingProducts()" [style.background]="isDarkMode() ? '#1e3a5f' : '#eff6ff'" [style.color]="isDarkMode() ? '#93c5fd' : '#1d4ed8'" style="padding:1rem;border-radius:10px">{{ t().pos.loadingCatalog }}</div>
+        <div *ngIf="productError()" [style.background]="isDarkMode() ? '#7f1d1d' : '#fef2f2'" [style.color]="isDarkMode() ? '#fca5a5' : '#991b1b'" style="padding:1rem;border-radius:10px">{{ productError() }}</div>
 
         <div *ngIf="!loadingProducts() && !productError()" style="max-height:360px;overflow:auto;display:flex;flex-direction:column;gap:.75rem">
-          <button *ngFor="let product of filteredProducts(); trackBy: trackProduct" (click)="addProduct(product)" [disabled]="product.stock === 0" style="display:flex;gap:1rem;padding:.75rem;border:1px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;text-align:left">
+          <button *ngFor="let product of filteredProducts(); trackBy: trackProduct" (click)="addProduct(product)" [disabled]="product.stock === 0" [style.background]="isDarkMode() ? '#0f172a' : '#fff'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #e5e7eb'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" style="display:flex;gap:1rem;padding:.75rem;border-radius:12px;cursor:pointer;text-align:left">
             <img [src]="product.imageUrl || 'https://via.placeholder.com/80?text=No+Image'" [alt]="product.name" style="width:72px;height:72px;object-fit:cover;border-radius:10px" />
             <div style="flex:1;display:flex;flex-direction:column;gap:.25rem">
               <div style="display:flex;justify-content:space-between;gap:.75rem;align-items:start">
-                <h3 style="margin:0;font-size:1rem">{{ product.name }}</h3>
-                <span style="font-weight:600">${{ product.price | number:'1.2-2' }}</span>
+                <div style="display:flex;flex-direction:column;gap:.125rem">
+                  <h3 style="margin:0;font-size:1rem">{{ product.name }}</h3>
+                  <span *ngIf="product.size" style="font-size:.8rem;font-weight:600" [style.color]="isDarkMode() ? '#60a5fa' : '#3b82f6'">{{ t().products.size }}: {{ product.size }}</span>
+                </div>
+                <span style="font-weight:600">₾{{ product.price | number:'1.2-2' }}</span>
               </div>
-              <p style="margin:0;color:#6b7280;font-size:.85rem">{{ product.description || 'No description provided.' }}</p>
-              <span [style.color]="product.stock === 0 ? '#b91c1c' : '#16a34a'" style="font-size:.85rem">{{ product.stock }} in stock</span>
+              <p style="margin:0;font-size:.85rem" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ product.description || t().pos.noDescription }}</p>
+              <span [style.color]="product.stock === 0 ? (isDarkMode() ? '#ef4444' : '#b91c1c') : (isDarkMode() ? '#22c55e' : '#16a34a')" style="font-size:.85rem">{{ product.stock }} {{ t().pos.inStock }}</span>
             </div>
           </button>
-          <div *ngIf="filteredProducts().length === 0" style="padding:1rem;border-radius:10px;border:1px dashed #d1d5db;text-align:center;color:#6b7280">No items match the current search.</div>
+          <div *ngIf="filteredProducts().length === 0" [style.background]="isDarkMode() ? '#0f172a' : 'transparent'" [style.border]="isDarkMode() ? '1px dashed #334155' : '1px dashed #d1d5db'" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'" style="padding:1rem;border-radius:10px;text-align:center">{{ t().pos.noItemsMatch }}</div>
         </div>
       </div>
     </section>
 
-    <section style="background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 10px 30px rgba(15,23,42,.08);display:flex;flex-direction:column;gap:1rem">
+    <section [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.box-shadow]="isDarkMode() ? '0 10px 30px rgba(0,0,0,.3)' : '0 10px 30px rgba(15,23,42,.08)'" style="border-radius:16px;padding:1.25rem;display:flex;flex-direction:column;gap:1rem">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
         <div>
-          <h2 style="margin:0;font-size:1.25rem">Cart</h2>
-          <p style="margin:.25rem 0 0;color:#6b7280;font-size:.9rem">{{ totalItems() }} items � Total ${{ total() | number:'1.2-2' }}</p>
+          <h2 style="margin:0;font-size:1.25rem">{{ t().pos.cart }}</h2>
+          <p style="margin:.25rem 0 0;font-size:.9rem" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">{{ totalItems() }} {{ t().pos.items }} • {{ t().pos.total }} ₾{{ total() | number:'1.2-2' }}</p>
         </div>
-        <button (click)="clearCart()" [disabled]="cart().length === 0" style="padding:.4rem .9rem;border-radius:8px;border:1px solid #d1d5db;background:#fff;cursor:pointer">Clear</button>
+        <button (click)="clearCart()" [disabled]="cart().length === 0" [style.background]="isDarkMode() ? '#0f172a' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="padding:.4rem .9rem;border-radius:8px;cursor:pointer">{{ t().common.clear }}</button>
       </div>
 
-      <div *ngIf="cart().length === 0" style="padding:1rem;border:1px dashed #d1d5db;border-radius:12px;text-align:center;color:#6b7280">
-        The cart is empty. Select a product from the catalog to get started.
+      <div *ngIf="cart().length === 0" [style.background]="isDarkMode() ? '#0f172a' : 'transparent'" [style.border]="isDarkMode() ? '1px dashed #334155' : '1px dashed #d1d5db'" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'" style="padding:1rem;border-radius:12px;text-align:center">
+        {{ t().pos.cartEmpty }}
       </div>
 
-      <div *ngFor="let item of cart(); trackBy: trackCart" style="display:flex;gap:1rem;align-items:center;border:1px solid #e5e7eb;border-radius:12px;padding:.75rem">
+      <div *ngFor="let item of cart(); trackBy: trackCart" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #e5e7eb'" [style.background]="isDarkMode() ? '#0f172a' : 'transparent'" style="display:flex;gap:1rem;align-items:center;border-radius:12px;padding:.75rem">
         <img [src]="item.imageUrl || 'https://via.placeholder.com/64?text=No+Image'" [alt]="item.name" style="width:64px;height:64px;object-fit:cover;border-radius:10px" />
         <div style="flex:1;display:flex;flex-direction:column;gap:.25rem">
           <strong>{{ item.name }}</strong>
-          <span style="color:#6b7280;font-size:.85rem">Unit: ${{ item.price | number:'1.2-2' }}</span>
-          <span style="color:#6b7280;font-size:.8rem">{{ item.stock - item.qty }} left in stock</span>
+          <span *ngIf="item.size" style="font-size:.8rem;font-weight:600" [style.color]="isDarkMode() ? '#60a5fa' : '#3b82f6'">{{ t().products.size }}: {{ item.size }}</span>
+          <span [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'" style="font-size:.85rem">{{ t().pos.unit }} ₾{{ item.price | number:'1.2-2' }}</span>
+          <span [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'" style="font-size:.8rem">{{ item.stock - item.qty }} {{ t().pos.leftInStock }}</span>
         </div>
         <div style="display:flex;align-items:center;gap:.35rem">
-          <button (click)="dec(item)" style="width:32px;height:32px;border-radius:999px;border:1px solid #d1d5db;background:#fff">-</button>
+          <button (click)="dec(item)" [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="width:32px;height:32px;border-radius:999px;cursor:pointer">-</button>
           <span style="min-width:24px;text-align:center;font-weight:600">{{ item.qty }}</span>
-          <button (click)="inc(item)" [disabled]="item.qty >= item.stock" style="width:32px;height:32px;border-radius:999px;border:1px solid #d1d5db;background:#fff">+</button>
+          <button (click)="inc(item)" [disabled]="item.qty >= item.stock" [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="width:32px;height:32px;border-radius:999px;cursor:pointer">+</button>
         </div>
-        <div style="font-weight:600">${{ (item.price * item.qty) | number:'1.2-2' }}</div>
-        <button (click)="remove(item)" style="border:none;background:transparent;color:#dc2626;font-weight:600;cursor:pointer">Remove</button>
+        <div style="font-weight:600">₾{{ (item.price * item.qty) | number:'1.2-2' }}</div>
+        <button (click)="remove(item)" [style.color]="isDarkMode() ? '#ef4444' : '#dc2626'" style="border:none;background:transparent;font-weight:600;cursor:pointer">{{ t().common.remove }}</button>
       </div>
 
-      <div *ngIf="cart().length" style="display:flex;flex-direction:column;gap:.75rem;border-top:1px solid #e5e7eb;padding-top:1rem">
-        <div style="display:flex;justify-content:space-between;color:#6b7280">
-          <span>Subtotal</span>
-          <span>${{ subtotal() | number:'1.2-2' }}</span>
+      <div *ngIf="cart().length" [style.border-top]="isDarkMode() ? '1px solid #334155' : '1px solid #e5e7eb'" style="display:flex;flex-direction:column;gap:.75rem;padding-top:1rem">
+        <div style="display:flex;justify-content:space-between" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">
+          <span>{{ t().pos.subtotal }}</span>
+          <span>₾{{ subtotal() | number:'1.2-2' }}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;color:#6b7280">
-          <span>Discounts</span>
-          <span>${{ discount() | number:'1.2-2' }}</span>
+        <div style="display:flex;justify-content:space-between" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">
+          <span>{{ t().pos.discounts }}</span>
+          <span>₾{{ discount() | number:'1.2-2' }}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;color:#6b7280">
-          <span>Tax</span>
-          <span>${{ tax() | number:'1.2-2' }}</span>
+        <div style="display:flex;justify-content:space-between" [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'">
+          <span>{{ t().pos.tax }}</span>
+          <span>₾{{ tax() | number:'1.2-2' }}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;font-size:1.1rem;font-weight:600">
-          <span>Total</span>
-          <span>${{ total() | number:'1.2-2' }}</span>
+          <span>{{ t().pos.total }}</span>
+          <span>₾{{ total() | number:'1.2-2' }}</span>
         </div>
 
-        <div style="display:flex;gap:1rem;flex-wrap:wrap">
-          <label style="display:flex;align-items:center;gap:.35rem;padding:.4rem .75rem;border:1px solid #d1d5db;border-radius:999px;cursor:pointer;background:#fff">
-            <input type="radio" name="pm" [checked]="payment === 'cash'" (change)="setPayment('cash')" /> Cash
-          </label>
-          <label [ngStyle]="cardChipStyles()" style="display:flex;align-items:center;gap:.35rem;padding:.4rem .75rem;border-radius:999px;cursor:pointer">
-            <input type="radio" name="pm" [checked]="payment === 'card'" (change)="setPayment('card')" /> Card
-            <span *ngIf="payment === 'card'">{{ cardBankLabel() }}</span>
-          </label>
+        <!-- Location and Cashier Selection -->
+        <div style="display:flex;flex-direction:column;gap:.75rem;padding:.75rem;border-radius:10px" [style.background]="isDarkMode() ? '#0f172a' : '#f9fafb'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #e5e7eb'">
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <label style="font-weight:600;font-size:.875rem" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'">📍 Location</label>
+            <select [value]="selectedLocationId() ?? ''" (change)="selectedLocationId.set($any($event.target).value ? +$any($event.target).value : null)" [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="padding:.5rem .75rem;border-radius:8px;cursor:pointer;font-size:.875rem">
+              <option value="">None (Optional)</option>
+              <option *ngFor="let loc of locations()" [value]="loc.id">{{ loc.name }}</option>
+            </select>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <label style="font-weight:600;font-size:.875rem" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'">👤 Served By Cashier</label>
+            <select [value]="selectedServedByCashierId() ?? ''" (change)="selectedServedByCashierId.set($any($event.target).value ? +$any($event.target).value : null)" [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="padding:.5rem .75rem;border-radius:8px;cursor:pointer;font-size:.875rem">
+              <option value="">None (Optional)</option>
+              <option *ngFor="let cashier of cashiers()" [value]="cashier.id">{{ cashier.email }} {{ cashier.name ? '(' + cashier.name + (cashier.surname ? ' ' + cashier.surname : '') + ')' : '' }}</option>
+            </select>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <label style="font-weight:600;font-size:.875rem" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'">🤝 Partner Cashier</label>
+            <select [value]="selectedPartnerCashierId() ?? ''" (change)="selectedPartnerCashierId.set($any($event.target).value ? +$any($event.target).value : null)" [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="padding:.5rem .75rem;border-radius:8px;cursor:pointer;font-size:.875rem">
+              <option value="">None (Optional)</option>
+              <option *ngFor="let cashier of cashiers()" [value]="cashier.id">{{ cashier.email }} {{ cashier.name ? '(' + cashier.name + (cashier.surname ? ' ' + cashier.surname : '') + ')' : '' }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label style="font-weight:600;font-size:.9rem" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'">{{ t().pos.paymentMethod }}</label>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <label [style.background]="payment === 'cash' ? (isDarkMode() ? '#475569' : '#e5e7eb') : (isDarkMode() ? '#1e293b' : '#fff')" [style.color]="isDarkMode() ? '#fff' : '#111827'" [style.border]="payment === 'cash' ? (isDarkMode() ? '3px solid #64748b' : '3px solid #6b7280') : (isDarkMode() ? '2px solid #334155' : '2px solid #d1d5db')" style="display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem 1.25rem;border-radius:12px;cursor:pointer;font-weight:700;font-size:1rem;min-width:120px;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,.1)">
+              <input type="radio" name="pm" [checked]="payment === 'cash'" (change)="setPayment('cash')" style="display:none" />
+              <span style="font-size:1.25rem">💵</span>
+              <span>{{ t().pos.cash }}</span>
+            </label>
+            <label [style.background]="payment === 'TBC' ? '#1d4ed8' : '#bfdbfe'" [style.color]="payment === 'TBC' ? '#fff' : '#1e3a8a'" [style.border]="payment === 'TBC' ? '3px solid #1e40af' : '2px solid #3b82f6'" style="display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem 1.25rem;border-radius:12px;cursor:pointer;font-weight:700;font-size:1rem;min-width:120px;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,.1)">
+              <input type="radio" name="pm" [checked]="payment === 'TBC'" (change)="setPayment('TBC')" style="display:none" />
+              <span style="font-size:1.25rem">💳</span>
+              <span>{{ t().pos.tbcBank }}</span>
+            </label>
+            <label [style.background]="payment === 'BOG' ? '#c2410c' : '#fed7aa'" [style.color]="payment === 'BOG' ? '#fff' : '#7c2d12'" [style.border]="payment === 'BOG' ? '3px solid #9a3412' : '2px solid #ea580c'" style="display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem 1.25rem;border-radius:12px;cursor:pointer;font-weight:700;font-size:1rem;min-width:120px;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,.1)">
+              <input type="radio" name="pm" [checked]="payment === 'BOG'" (change)="setPayment('BOG')" style="display:none" />
+              <span style="font-size:1.25rem">💳</span>
+              <span>{{ t().pos.bankOfGeorgia }}</span>
+            </label>
+          </div>
         </div>
 
         <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-          <button type="button" (click)="openOfferModal()" style="padding:.65rem 1rem;border:1px solid #d1d5db;border-radius:10px;background:#fff;color:#111827;font-weight:600;cursor:pointer">Request admin discount</button>
-          <button type="button" (click)="submit()" [disabled]="cart().length === 0" style="padding:.75rem 1.25rem;border:none;border-radius:10px;background:#111827;color:#fff;font-size:1rem;font-weight:600;cursor:pointer">
-            Complete sale
+          <button type="button" (click)="openOfferModal()" [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="padding:.65rem 1rem;border-radius:10px;font-weight:600;cursor:pointer">{{ t().pos.requestAdminDiscount }}</button>
+          <button type="button" (click)="submit()" [disabled]="cart().length === 0" [style.background]="isDarkMode() ? '#0ea5e9' : '#111827'" [style.color]="'#fff'" style="padding:.75rem 1.25rem;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer">
+            {{ t().pos.completeSale }}
           </button>
         </div>
       </div>
     </section>
   </div>
 
-  <!-- Card bank selection -->
-  <div *ngIf="cardModalOpen()" style="position:fixed;inset:0;background:rgba(15,23,42,.35);display:flex;align-items:center;justify-content:center;z-index:20">
-    <div style="background:#fff;padding:1.5rem;border-radius:16px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:1rem">
-      <h3 style="margin:0;font-size:1.25rem">Select acquiring bank</h3>
-      <p style="margin:0;color:#6b7280;font-size:.9rem">Choose which bank will process this card payment.</p>
-      <div style="display:flex;flex-direction:column;gap:.75rem">
-        <button type="button" (click)="confirmCardBank('TBC')" [ngStyle]="cardButtonStyles('TBC')" style="padding:.65rem;border-radius:10px;border:1px solid transparent;cursor:pointer;font-weight:600">TBC Bank</button>
-        <button type="button" (click)="confirmCardBank('BOG')" [ngStyle]="cardButtonStyles('BOG')" style="padding:.65rem;border-radius:10px;border:1px solid transparent;cursor:pointer;font-weight:600">Bank of Georgia</button>
-      </div>
-      <button type="button" (click)="cancelCardSelection()" style="align-self:flex-end;border:none;background:transparent;color:#dc2626;font-weight:600;cursor:pointer">Cancel</button>
-    </div>
-  </div>
-
   <!-- Offer request modal -->
-  <div *ngIf="offerModalOpen()" style="position:fixed;inset:0;background:rgba(15,23,42,.35);display:flex;align-items:center;justify-content:center;z-index:30">
-    <div style="background:#fff;padding:1.5rem;border-radius:16px;max-width:520px;width:100%;display:flex;flex-direction:column;gap:1rem">
+  <div *ngIf="offerModalOpen()" [style.background]="isDarkMode() ? 'rgba(0,0,0,.6)' : 'rgba(15,23,42,.35)'" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:30">
+    <div [style.background]="isDarkMode() ? '#1e293b' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" style="padding:1.5rem;border-radius:16px;max-width:520px;width:100%;display:flex;flex-direction:column;gap:1rem">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0;font-size:1.25rem">Request admin discount</h3>
-        <button type="button" (click)="closeOfferModal()" style="border:none;background:transparent;font-weight:600;cursor:pointer">�</button>
+        <h3 style="margin:0;font-size:1.25rem">{{ t().pos.requestAdminDiscount }}</h3>
+        <button type="button" (click)="closeOfferModal()" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" style="border:none;background:transparent;font-weight:600;cursor:pointer">✕</button>
       </div>
       <form [formGroup]="offerForm" (ngSubmit)="submitOffer()" style="display:flex;flex-direction:column;gap:1rem">
         <label style="display:flex;flex-direction:column;gap:.35rem">
-          <span style="font-weight:600">Shop / Counter</span>
-          <input formControlName="from_shop" placeholder="POS Front Desk" />
+          <span style="font-weight:600">{{ t().pos.shopCounter }}</span>
+          <input formControlName="from_shop" placeholder="POS Front Desk" [style.background]="isDarkMode() ? '#0f172a' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="padding:.5rem;border-radius:6px" />
         </label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
           <label style="display:flex;flex-direction:column;gap:.35rem">
-            <span style="font-weight:600">Discount type</span>
-            <select formControlName="discount_type">
-              <option value="percentage">Percentage</option>
-              <option value="amount">Fixed amount</option>
+            <span style="font-weight:600">{{ t().pos.discountType }}</span>
+            <select formControlName="discount_type" [style.background]="isDarkMode() ? '#0f172a' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="padding:.5rem;border-radius:6px">
+              <option value="percentage">{{ t().pos.percentage }}</option>
+              <option value="manual">{{ t().pos.manualAmount }}</option>
             </select>
           </label>
           <label style="display:flex;flex-direction:column;gap:.35rem">
-            <span style="font-weight:600">Value</span>
-            <input formControlName="discount_value" type="number" min="0" />
+            <span style="font-weight:600">{{ t().pos.value }}</span>
+            <input formControlName="discount_value" type="number" min="0" [style.background]="isDarkMode() ? '#0f172a' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="padding:.5rem;border-radius:6px" />
           </label>
         </div>
         <label style="display:flex;flex-direction:column;gap:.35rem">
-          <span style="font-weight:600">Notes to admin</span>
-          <textarea formControlName="notes" rows="3" placeholder="Add any context�customer loyalty, bundle, etc."></textarea>
+          <span style="font-weight:600">{{ t().pos.notesToAdmin }}</span>
+          <textarea formControlName="notes" rows="3" [placeholder]="t().pos.notesPlaceholder" [style.background]="isDarkMode() ? '#0f172a' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="padding:.5rem;border-radius:6px"></textarea>
         </label>
+        <div [style.background]="isDarkMode() ? '#0f172a' : '#f3f4f6'" style="padding:.75rem 1rem;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+          <span [style.color]="isDarkMode() ? '#94a3b8' : '#6b7280'" style="font-size:.9rem">{{ t().pos.paymentMethod }}</span>
+          <span style="font-weight:600">{{ payment === 'TBC' ? t().offersStatus.cardTBC : (payment === 'BOG' ? t().offersStatus.cardBOG : t().pos.cash) }}</span>
+        </div>
         <div style="display:flex;justify-content:flex-end;gap:.75rem">
-          <button type="button" (click)="closeOfferModal()" style="padding:.6rem 1.1rem;border:1px solid #d1d5db;border-radius:10px;background:#fff;cursor:pointer">Cancel</button>
-          <button type="submit" [disabled]="offerSubmitting()" style="padding:.6rem 1.1rem;border:none;border-radius:10px;background:#111827;color:#fff;font-weight:600;cursor:pointer">
-            {{ offerSubmitting() ? 'Sending�' : 'Send to admin' }}
+          <button type="button" (click)="closeOfferModal()" [style.background]="isDarkMode() ? '#0f172a' : '#fff'" [style.color]="isDarkMode() ? '#e2e8f0' : '#111827'" [style.border]="isDarkMode() ? '1px solid #334155' : '1px solid #d1d5db'" style="padding:.6rem 1.1rem;border-radius:10px;cursor:pointer">{{ t().common.cancel }}</button>
+          <button type="submit" [disabled]="offerSubmitting()" [style.background]="isDarkMode() ? '#0ea5e9' : '#111827'" style="padding:.6rem 1.1rem;border:none;border-radius:10px;color:#fff;font-weight:600;cursor:pointer">
+            {{ offerSubmitting() ? t().pos.sending : t().pos.sendToAdmin }}
           </button>
         </div>
       </form>

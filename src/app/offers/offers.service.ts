@@ -9,12 +9,12 @@ export class OffersService {
   private readonly BASE = `${environment.apiUrl}/offers`;
 
   list() {
-    return this.http.get<Offer[]>(`${this.BASE}/list.js`);
+    return this.http.get<Offer[]>(this.BASE);
   }
   create(payload: CreateOfferRequest) {
-    return this.http.post<Offer>(`${this.BASE}/create.js`, payload);
+    return this.http.post<Offer>(this.BASE, payload);
   }
   updateStatus(payload: UpdateOfferStatusRequest) {
-    return this.http.put<Offer>(`${this.BASE}/approve.js`, payload);
+    return this.http.put<Offer>(`${this.BASE}/status`, payload);
   }
 }

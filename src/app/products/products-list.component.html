@@ -1,97 +1,206 @@
 <div style="display:flex;flex-direction:column;gap:1.5rem">
   <header style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
     <div>
-      <h1 style="margin:0;font-size:1.5rem">Product Catalog</h1>
-      <p style="margin:0;color:#6b7280">Review inventory, adjust stock levels, and add new items.</p>
+      <h1 style="margin:0;font-size:1.5rem">{{ t().products.title }}</h1>
+      <p style="margin:0;color:#6b7280">{{ t().products.subtitle }}</p>
     </div>
-    <button style="padding:.5rem 1rem" (click)="showCreate.set(true)">Add Product</button>
+    <button style="padding:.5rem 1rem" (click)="showCreate.set(true)">{{ t().products.addProduct }}</button>
   </header>
 
   <section style="display:flex;gap:1rem;flex-wrap:wrap">
-    <div style="flex:1 1 160px;padding:1rem;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb">
-      <p style="margin:0;color:#6b7280;font-size:.875rem">Total products</p>
-      <p style="margin:.25rem 0 0;font-size:1.5rem;font-weight:600">{{ totalCount() }}</p>
+    <div class="stat-card">
+      <p class="stat-label">{{ t().products.totalProducts }}</p>
+      <p class="stat-value">{{ totalCount() }}</p>
     </div>
-    <div style="flex:1 1 160px;padding:1rem;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb">
-      <p style="margin:0;color:#6b7280;font-size:.875rem">Low stock (&lt; 5)</p>
-      <p style="margin:.25rem 0 0;font-size:1.5rem;font-weight:600">{{ lowStockCount() }}</p>
+    <div class="stat-card">
+      <p class="stat-label">{{ t().products.lowStock }}</p>
+      <p class="stat-value" [style.color]="lowStockCount() > 0 ? '#dc2626' : '#111827'">{{ lowStockCount() }}</p>
     </div>
   </section>
 
   <div style="display:flex;gap:.75rem;align-items:center">
-    <input style="flex:1;padding:.5rem;border:1px solid #d1d5db;border-radius:8px" placeholder="Search by name or description" [value]="search()" (input)="search.set(($any($event.target)).value)" />
-    <button (click)="reload()" style="padding:.5rem 1rem">Refresh</button>
+    <input style="flex:1;padding:.5rem;border:1px solid #d1d5db;border-radius:8px" [placeholder]="t().products.searchPlaceholder" [value]="search()" (input)="search.set(($any($event.target)).value)" />
+    <button
+      (click)="toggleLowStockFilter()"
+      [style.background]="showLowStockOnly() ? '#f59e0b' : '#6b7280'"
+      [style.font-weight]="showLowStockOnly() ? '600' : '400'"
+      style="padding:.5rem 1rem;white-space:nowrap"
+    >
+      {{ showLowStockOnly() ? '⚠️ Low Stock Filter ON' : 'Show Low Stock Only' }}
+    </button>
+    <button (click)="reload()" style="padding:.5rem 1rem">{{ t().common.refresh }}</button>
   </div>
 
-  <section *ngIf="error()" style="padding:.75rem;border-radius:8px;background:#fef2f2;color:#991b1b">
+  <section *ngIf="error()" class="alert alert-error">
     {{ error() }}
   </section>
-  <section *ngIf="loading()" style="padding:.75rem;border-radius:8px;background:#eff6ff;color:#1d4ed8">
-    Loading latest catalog...
+  <section *ngIf="loading()" class="alert alert-info">
+    {{ t().common.loading }}...
   </section>
 
-  <section *ngIf="showCreate()" style="border:1px solid #e5e7eb;padding:1rem;border-radius:12px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-      <h2 style="margin:0;font-size:1.25rem">Add a product</h2>
-      <button type="button" (click)="showCreate.set(false)" style="padding:.25rem .75rem">Close</button>
+  <section *ngIf="showCreate()" style="border:1px solid #e5e7eb;padding:1.5rem;border-radius:12px;background:white;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+      <h2 style="margin:0;font-size:1.25rem;font-weight:600">{{ editingProduct() ? t().products.editProduct : t().products.addProduct }}</h2>
+      <button type="button" (click)="closeDialog()" style="padding:.25rem .75rem">✕ {{ t().common.close }}</button>
     </div>
-    <form [formGroup]="form" (ngSubmit)="create()" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem">
-      <div style="display:flex;flex-direction:column;gap:.25rem">
-        <label>Name</label>
-        <input formControlName="name" placeholder="Classic T-Shirt" />
+    <form [formGroup]="form" (ngSubmit)="create()" style="display:flex;flex-direction:column;gap:1.5rem">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label>{{ t().products.name }} *</label>
+          <input formControlName="name" placeholder="Classic T-Shirt" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label>{{ t().products.price }} *</label>
+          <input formControlName="price" type="number" step="0.01" placeholder="0.00" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label>{{ t().products.quantity }} *</label>
+          <input formControlName="quantity" type="number" placeholder="0" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label>{{ t().products.sizeOptional }}</label>
+          <input formControlName="size" placeholder="e.g., S, M, L, XL, 32, One Size" maxlength="50" />
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:.25rem">
-        <label>Price</label>
-        <input formControlName="price" type="number" step="0.01" />
-      </div>
-      <div style="display:flex;flex-direction:column;gap:.25rem">
-        <label>Quantity</label>
-        <input formControlName="quantity" type="number" />
-      </div>
-      <div style="display:flex;flex-direction:column;gap:.25rem">
-        <label>Image URL</label>
-        <input formControlName="image_url" placeholder="https://" />
-      </div>
-      <div style="display:flex;flex-direction:column;gap:.25rem;grid-column:1/-1">
-        <label>Description</label>
+
+      <div style="display:flex;flex-direction:column;gap:.5rem">
+        <label>{{ t().products.description }}</label>
         <textarea formControlName="description" rows="3" placeholder="Short description..."></textarea>
       </div>
-      <div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:.5rem">
-        <button type="button" (click)="showCreate.set(false)" style="padding:.5rem 1rem">Cancel</button>
-        <button type="submit" style="padding:.5rem 1rem" [disabled]="form.invalid || loading()">Save product</button>
+
+      <!-- Location Selection -->
+      <div style="display:flex;flex-direction:column;gap:.5rem">
+        <label>📍 Location (Optional)</label>
+        <select formControlName="location_id">
+          <option [ngValue]="null">No Location</option>
+          <option *ngFor="let location of locations()" [ngValue]="location.id">{{ location.name }}</option>
+        </select>
+      </div>
+
+      <!-- Image Upload Section -->
+      <div style="display:flex;flex-direction:column;gap:1rem;padding:1rem;background:#f9fafb;border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label style="margin:0;font-weight:600">{{ t().products.productImage }}</label>
+          <button type="button" (click)="toggleImageInputMode()" style="padding:.375rem .75rem;font-size:.875rem">
+            {{ useFileUpload() ? t().products.useUrl : t().products.uploadFile }}
+          </button>
+        </div>
+
+        <!-- File Upload Mode -->
+        <div *ngIf="useFileUpload()" style="display:flex;flex-direction:column;gap:.75rem">
+          <div style="display:flex;gap:.75rem;align-items:flex-start">
+            <input
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+              (change)="onFileSelected($event)"
+              style="flex:1"
+              #fileInput
+            />
+            <button type="button" *ngIf="selectedFile()" (click)="clearImage(); fileInput.value=''" style="padding:.5rem .75rem">
+              {{ t().common.clear }}
+            </button>
+          </div>
+          <p style="margin:0;font-size:.75rem;color:#6b7280">
+            {{ t().products.fileFormats }}
+          </p>
+          <div *ngIf="selectedFile()" style="padding:.5rem;background:#e0f2fe;border-radius:6px;font-size:.875rem;color:#0369a1">
+            ✓ {{ t().products.selected }} {{ selectedFile()!.name }} ({{ (selectedFile()!.size / 1024).toFixed(1) }} KB)
+          </div>
+        </div>
+
+        <!-- URL Mode -->
+        <div *ngIf="!useFileUpload()" style="display:flex;flex-direction:column;gap:.5rem">
+          <input formControlName="image_url" [placeholder]="t().products.enterUrl" />
+          <p style="margin:0;font-size:.75rem;color:#6b7280">
+            {{ t().products.enterUrl }}
+          </p>
+        </div>
+
+        <!-- Image Preview -->
+        <div *ngIf="imagePreview()" style="border:1px solid #e5e7eb;border-radius:8px;padding:.75rem;background:white">
+          <p style="margin:0 0 .5rem;font-size:.875rem;font-weight:600;color:#374151">{{ t().products.preview }}</p>
+          <div style="position:relative;max-width:300px">
+            <img [src]="imagePreview()" alt="Preview" style="width:100%;height:auto;border-radius:6px;display:block" />
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:.75rem;padding-top:1rem;border-top:1px solid #e5e7eb">
+        <button type="button" (click)="closeDialog()" style="padding:.75rem 1.5rem">{{ t().common.cancel }}</button>
+        <button type="submit" style="padding:.75rem 1.5rem;font-weight:600" [disabled]="form.invalid || loading()">
+          {{ loading() ? t().products.saving : (editingProduct() ? t().products.updateProduct : t().products.saveProduct) }}
+        </button>
       </div>
     </form>
   </section>
 
   <div *ngIf="!loading() && filtered().length === 0" style="padding:1.5rem;border:1px dashed #d1d5db;border-radius:12px;text-align:center;color:#6b7280">
-    No products match the current filters.
+    {{ t().products.noProducts }}
   </div>
 
   <div style="overflow:auto;border:1px solid #e5e7eb;border-radius:12px">
     <table style="width:100%;border-collapse:collapse">
       <thead style="background:#f3f4f6">
         <tr>
-          <th style="text-align:left;padding:.75rem;font-weight:500">Product</th>
-          <th style="text-align:left;padding:.75rem;font-weight:500">Price</th>
-          <th style="text-align:left;padding:.75rem;font-weight:500">In stock</th>
-          <th style="text-align:left;padding:.75rem;font-weight:500">Last updated</th>
+          <th style="text-align:left;padding:.75rem;font-weight:500;width:50px">{{ t().products.image }}</th>
+          <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.name }}</th>
+          <th style="text-align:left;padding:.75rem;font-weight:500">Location</th>
+          <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.size }}</th>
+          <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.price }}</th>
+          <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.inStock }}</th>
+          <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.lastUpdated }}</th>
+          <th style="text-align:right;padding:.75rem;font-weight:500">{{ t().products.actions }}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let p of filtered(); trackBy: trackById" style="border-top:1px solid #f3f4f6">
           <td style="padding:.75rem">
-            <div style="display:flex;flex-direction:column">
-              <span style="font-weight:500">{{ p.name }}</span>
-              <small style="color:#6b7280">{{ p.description || 'No description provided' }}</small>
+            <div style="width:48px;height:48px;border-radius:6px;overflow:hidden;background:#f3f4f6;display:flex;align-items:center;justify-content:center">
+              <img *ngIf="p.image_url" [src]="p.image_url" [alt]="p.name" style="width:100%;height:100%;object-fit:cover" />
+              <span *ngIf="!p.image_url" style="font-size:1.5rem">📦</span>
             </div>
           </td>
-          <td style="padding:.75rem">${{ p.price | number:'1.2-2' }}</td>
           <td style="padding:.75rem">
-            <span [style.color]="p.quantity < 5 ? '#b91c1c' : '#166534'">
-              {{ p.quantity }} units
+            <div style="display:flex;flex-direction:column">
+              <span style="font-weight:500">{{ p.name }}</span>
+              <small style="color:#6b7280">{{ p.description || t().pos.noDescription }}</small>
+            </div>
+          </td>
+          <td style="padding:.75rem">
+            <span *ngIf="p.location_name" style="display:flex;align-items:center;gap:0.25rem;font-size:0.875rem">
+              📍 {{ p.location_name }}
+            </span>
+            <span *ngIf="!p.location_name" style="color:#9ca3af;font-size:0.875rem">-</span>
+          </td>
+          <td style="padding:.75rem">
+            <span [style.color]="p.size ? (isDarkMode() ? '#e2e8f0' : '#111827') : (isDarkMode() ? '#64748b' : '#9ca3af')">{{ p.size || '-' }}</span>
+          </td>
+          <td style="padding:.75rem">₾{{ p.price | number:'1.2-2' }}</td>
+          <td style="padding:.75rem">
+            <span
+              [style.color]="p.quantity === 0 ? '#991b1b' : (p.quantity < lowStockThreshold() ? '#b91c1c' : '#166534')"
+              [style.font-weight]="p.quantity < lowStockThreshold() ? '600' : '400'"
+            >
+              @if (p.quantity === 0) {
+                <span style="padding:0.25rem 0.5rem;background:#fef2f2;border-radius:4px">Out of Stock</span>
+              } @else if (p.quantity < lowStockThreshold()) {
+                <span style="padding:0.25rem 0.5rem;background:#fef3c7;border-radius:4px">⚠️ {{ p.quantity }} {{ t().products.units }}</span>
+              } @else {
+                {{ p.quantity }} {{ t().products.units }}
+              }
             </span>
           </td>
-          <td style="padding:.75rem">{{ p.created_at | date:'mediumDate' }}</td>
+          <td style="padding:.75rem;color:#6b7280;font-size:.875rem">{{ p.created_at | date:'short' }}</td>
+          <td style="padding:.75rem">
+            <div style="display:flex;gap:.5rem;justify-content:flex-end">
+              <button type="button" (click)="openEditDialog(p)" style="padding:.375rem .75rem;font-size:.875rem;background:#3b82f6" [title]="t().common.edit">
+                ✏️ {{ t().common.edit }}
+              </button>
+              <button type="button" (click)="deleteProduct(p)" style="padding:.375rem .75rem;font-size:.875rem;background:#ef4444" [title]="t().common.delete">
+                🗑️ {{ t().common.delete }}
+              </button>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
