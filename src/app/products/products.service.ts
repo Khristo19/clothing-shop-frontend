@@ -11,6 +11,7 @@ export interface ProductFormData {
   size?: string | null;
   image_url?: string;
   image?: File;
+  initial_cost?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -38,6 +39,9 @@ export class ProductsService {
       if (payload.size) {
         formData.append('size', payload.size);
       }
+      if (payload.initial_cost !== null && payload.initial_cost !== undefined) {
+        formData.append('initial_cost', payload.initial_cost.toString());
+      }
       formData.append('image', payload.image);
 
       // IMPORTANT: Do NOT set Content-Type header!
@@ -52,7 +56,8 @@ export class ProductsService {
         quantity: payload.quantity,
         size: payload.size || null,
         description: payload.description,
-        image_url: payload.image_url
+        image_url: payload.image_url,
+        initial_cost: payload.initial_cost || null
       };
       // Angular HttpClient automatically sets Content-Type: application/json for objects
       return this.http.post<Item>(`${this.BASE}/add`, jsonPayload);
@@ -68,6 +73,9 @@ export class ProductsService {
       if (payload.quantity !== undefined) formData.append('quantity', payload.quantity.toString());
       if (payload.description) formData.append('description', payload.description);
       if (payload.size) formData.append('size', payload.size);
+      if (payload.initial_cost !== null && payload.initial_cost !== undefined) {
+        formData.append('initial_cost', payload.initial_cost.toString());
+      }
       formData.append('image', payload.image);
 
       // IMPORTANT: Do NOT set Content-Type header!
@@ -82,7 +90,8 @@ export class ProductsService {
         quantity: payload.quantity,
         size: payload.size || null,
         description: payload.description,
-        image_url: payload.image_url
+        image_url: payload.image_url,
+        initial_cost: payload.initial_cost || null
       };
       // Angular HttpClient automatically sets Content-Type: application/json for objects
       return this.http.put<Item>(`${this.BASE}/${id}`, jsonPayload);

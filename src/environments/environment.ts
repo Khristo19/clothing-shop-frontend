@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiUrl: 'https://clothing-shop-backend.vercel.app/api'
+  production: true,
+  apiUrl: 'https://api.tina-to.com/api'
 };

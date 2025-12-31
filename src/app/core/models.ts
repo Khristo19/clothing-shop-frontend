@@ -10,6 +10,7 @@ export interface Item {
   image_url?: string | null;
   location_id?: number | null;
   location_name?: string | null;
+  initial_cost?: number | null;
 }
 
 export interface Offer {

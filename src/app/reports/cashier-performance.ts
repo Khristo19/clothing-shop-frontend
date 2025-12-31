@@ -86,7 +86,7 @@ export class CashierPerformanceComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        this.error.set(err?.error?.message || 'Failed to load cashier performance');
+        this.error.set(err?.error?.message || 'Failed to load user performance');
       },
     });
   }
@@ -99,7 +99,7 @@ export class CashierPerformanceComponent {
     this.performance().reduce((sum, c) => sum + parseInt(c.total_transactions || '0', 10), 0)
   );
 
-  readonly activeCashiers = computed(() =>
+  readonly activeUsers = computed(() =>
     this.performance().filter((c) => parseInt(c.total_transactions || '0', 10) > 0).length
   );
 
@@ -114,6 +114,14 @@ export class CashierPerformanceComponent {
   getMedalEmoji(rank: number): string {
     const medals = ['🥇', '🥈', '🥉'];
     return medals[rank - 1] || '👤';
+  }
+
+  getRoleIcon(role: string): string {
+    return role === 'admin' ? '👑' : '👤';
+  }
+
+  getRoleBadgeColor(role: string): string {
+    return role === 'admin' ? '#8b5cf6' : '#3b82f6';
   }
 
   calculatePercentage(amount: string, total: number): number {
@@ -132,6 +140,7 @@ export class CashierPerformanceComponent {
       'Rank',
       'Name',
       'Email',
+      'Role',
       'Total Revenue',
       'Transactions',
       'Avg Transaction',
@@ -139,15 +148,16 @@ export class CashierPerformanceComponent {
       'Last Sale',
     ];
 
-    const rows = this.performance().map((cashier, index) => [
+    const rows = this.performance().map((user, index) => [
       index + 1,
-      this.getDisplayName(cashier),
-      cashier.email,
-      cashier.total_revenue,
-      cashier.total_transactions,
-      cashier.avg_transaction_value,
-      this.formatDateShort(cashier.first_sale),
-      this.formatDateShort(cashier.last_sale),
+      this.getDisplayName(user),
+      user.email,
+      user.role,
+      user.total_revenue,
+      user.total_transactions,
+      user.avg_transaction_value,
+      this.formatDateShort(user.first_sale),
+      this.formatDateShort(user.last_sale),
     ]);
 
     const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
@@ -156,7 +166,7 @@ export class CashierPerformanceComponent {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `cashier-performance-${this.fromDate()}-${this.toDate()}.csv`;
+    link.download = `user-performance-${this.fromDate()}-${this.toDate()}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   }

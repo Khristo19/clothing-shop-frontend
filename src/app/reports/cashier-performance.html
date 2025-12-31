@@ -2,8 +2,8 @@
   <!-- Header -->
   <header style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap">
     <div>
-      <h1 style="margin:0;font-size:1.75rem;font-weight:700;color:#111827">📊 Cashier Performance</h1>
-      <p style="margin:0.375rem 0 0;color:#6b7280;font-size:0.95rem">Track sales metrics and performance by cashier</p>
+      <h1 style="margin:0;font-size:1.75rem;font-weight:700;color:#111827">📊 {{ t().reports.userPerformance }}</h1>
+      <p style="margin:0.375rem 0 0;color:#6b7280;font-size:0.95rem">{{ t().reports.userPerformanceSubtitle }}</p>
     </div>
   </header>
 
@@ -11,14 +11,14 @@
   <section style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
     <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem">
       <span style="font-size:1.25rem">📅</span>
-      <h3 style="margin:0;font-size:1.1rem;font-weight:600;color:#111827">Date Range</h3>
+      <h3 style="margin:0;font-size:1.1rem;font-weight:600;color:#111827">{{ t().reports.dateRange }}</h3>
     </div>
 
     <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:end">
       <!-- Date Inputs -->
       <div style="display:flex;gap:1rem;flex:1;min-width:300px">
         <div style="display:flex;flex-direction:column;gap:0.5rem;flex:1">
-          <label style="font-weight:600;font-size:0.875rem;color:#374151">From</label>
+          <label style="font-weight:600;font-size:0.875rem;color:#374151">{{ t().reports.from }}</label>
           <input
             type="date"
             [(ngModel)]="fromDate"
@@ -26,7 +26,7 @@
           />
         </div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;flex:1">
-          <label style="font-weight:600;font-size:0.875rem;color:#374151">To</label>
+          <label style="font-weight:600;font-size:0.875rem;color:#374151">{{ t().reports.to }}</label>
           <input
             type="date"
             [(ngModel)]="toDate"
@@ -41,19 +41,19 @@
           (click)="setThisMonth()"
           style="padding:0.5rem 1rem;background:#6b7280;color:white;border:none;border-radius:8px;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.2s"
         >
-          This Month
+          {{ t().reports.thisMonth }}
         </button>
         <button
           (click)="setLastMonth()"
           style="padding:0.5rem 1rem;background:#6b7280;color:white;border:none;border-radius:8px;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.2s"
         >
-          Last Month
+          {{ t().reports.lastMonth }}
         </button>
         <button
           (click)="setThisYear()"
           style="padding:0.5rem 1rem;background:#6b7280;color:white;border:none;border-radius:8px;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.2s"
         >
-          This Year
+          {{ t().reports.thisYear }}
         </button>
       </div>
 
@@ -64,7 +64,7 @@
         style="padding:0.5rem 1.5rem;background:#3b82f6;color:white;border:none;border-radius:8px;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.2s"
         [style.opacity]="loading() ? '0.6' : '1'"
       >
-        Apply Filters
+        {{ t().reports.applyFilters }}
       </button>
     </div>
   </section>
@@ -86,36 +86,36 @@
     <!-- Total Revenue -->
     <div style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);border:none;color:white;border-radius:12px;padding:1.5rem;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(16,185,129,0.2)">
       <div style="position:absolute;top:-20px;right:-20px;font-size:5rem;opacity:0.15">💰</div>
-      <p style="margin:0;font-size:0.875rem;font-weight:500;opacity:0.9;text-transform:uppercase;letter-spacing:0.05em">Total Revenue</p>
+      <p style="margin:0;font-size:0.875rem;font-weight:500;opacity:0.9;text-transform:uppercase;letter-spacing:0.05em">{{ t().reports.totalRevenue }}</p>
       <p style="margin:0.5rem 0 0;font-size:2rem;font-weight:700">{{ currency() }}{{ totalRevenue() | number:'1.2-2' }}</p>
     </div>
 
     <!-- Total Transactions -->
     <div style="background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);border:none;color:white;border-radius:12px;padding:1.5rem;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(59,130,246,0.2)">
       <div style="position:absolute;top:-20px;right:-20px;font-size:5rem;opacity:0.15">🛒</div>
-      <p style="margin:0;font-size:0.875rem;font-weight:500;opacity:0.9;text-transform:uppercase;letter-spacing:0.05em">Total Transactions</p>
+      <p style="margin:0;font-size:0.875rem;font-weight:500;opacity:0.9;text-transform:uppercase;letter-spacing:0.05em">{{ t().reports.totalTransactions }}</p>
       <p style="margin:0.5rem 0 0;font-size:2rem;font-weight:700">{{ totalTransactions() }}</p>
     </div>
 
-    <!-- Active Cashiers -->
+    <!-- Active Users -->
     <div style="background:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%);border:none;color:white;border-radius:12px;padding:1.5rem;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(139,92,246,0.2)">
       <div style="position:absolute;top:-20px;right:-20px;font-size:5rem;opacity:0.15">👥</div>
-      <p style="margin:0;font-size:0.875rem;font-weight:500;opacity:0.9;text-transform:uppercase;letter-spacing:0.05em">Active Cashiers</p>
-      <p style="margin:0.5rem 0 0;font-size:2rem;font-weight:700">{{ activeCashiers() }}</p>
+      <p style="margin:0;font-size:0.875rem;font-weight:500;opacity:0.9;text-transform:uppercase;letter-spacing:0.05em">{{ t().reports.activeUsers }}</p>
+      <p style="margin:0.5rem 0 0;font-size:2rem;font-weight:700">{{ activeUsers() }}</p>
     </div>
   </section>
 
-  <!-- Cashier Rankings -->
+  <!-- User Rankings -->
   <section *ngIf="!loading() && !error()">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
-      <h2 style="margin:0;font-size:1.5rem;font-weight:700;color:#111827">🏆 Cashier Rankings</h2>
+      <h2 style="margin:0;font-size:1.5rem;font-weight:700;color:#111827">🏆 {{ t().reports.userRankings }}</h2>
       <button
         (click)="exportToCSV()"
         *ngIf="performance().length > 0"
         style="padding:0.5rem 1rem;background:#10b981;color:white;border:none;border-radius:8px;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:0.5rem"
       >
         <span>📥</span>
-        Export CSV
+        {{ t().reports.exportCSV }}
       </button>
     </div>
 
@@ -125,8 +125,8 @@
       style="padding:3rem 1.5rem;border:2px dashed #d1d5db;border-radius:16px;text-align:center;background:#f9fafb"
     >
       <div style="font-size:4rem;margin-bottom:1rem;opacity:0.4">📊</div>
-      <p style="margin:0;color:#6b7280;font-size:1.1rem;font-weight:500">No sales data available</p>
-      <p style="margin:0.5rem 0 0;color:#9ca3af;font-size:0.875rem">No cashiers have recorded sales in this period</p>
+      <p style="margin:0;color:#6b7280;font-size:1.1rem;font-weight:500">{{ t().reports.noSalesData }}</p>
+      <p style="margin:0.5rem 0 0;color:#9ca3af;font-size:0.875rem">{{ t().reports.noSalesSubtitle }}</p>
     </div>
 
     <!-- Cashier Cards -->
@@ -141,11 +141,20 @@
           <div style="flex:1;min-width:200px">
             <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
               <span style="font-size:2rem">{{ getMedalEmoji(i + 1) }}</span>
-              <div>
-                <div style="font-size:1.25rem;font-weight:700;color:#111827">
-                  #{{ i + 1 }} {{ getDisplayName(cashier) }}
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+                  <div style="font-size:1.25rem;font-weight:700;color:#111827">
+                    #{{ i + 1 }} {{ getDisplayName(cashier) }}
+                  </div>
+                  <span
+                    style="padding:0.25rem 0.75rem;border-radius:12px;font-size:0.75rem;font-weight:600;color:white;display:inline-flex;align-items:center;gap:0.25rem"
+                    [style.background]="getRoleBadgeColor(cashier.role)"
+                  >
+                    <span>{{ getRoleIcon(cashier.role) }}</span>
+                    {{ cashier.role === 'admin' ? t().reports.admin : t().reports.cashier }}
+                  </span>
                 </div>
-                <div style="font-size:0.875rem;color:#6b7280;display:flex;align-items:center;gap:0.25rem">
+                <div style="font-size:0.875rem;color:#6b7280;display:flex;align-items:center;gap:0.25rem;margin-top:0.25rem">
                   <span>📧</span>
                   {{ cashier.email }}
                 </div>
@@ -155,7 +164,7 @@
 
           <!-- Revenue with Percentage -->
           <div style="text-align:right">
-            <div style="font-size:0.75rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem">Revenue</div>
+            <div style="font-size:0.75rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.25rem">{{ t().reports.revenue }}</div>
             <div style="font-size:1.75rem;font-weight:700;color:#059669">
               {{ currency() }}{{ cashier.total_revenue | number:'1.2-2' }}
             </div>
@@ -168,25 +177,25 @@
         <!-- Stats Grid -->
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;padding:1rem;background:#f9fafb;border-radius:8px">
           <div>
-            <div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:0.25rem">🛒 TRANSACTIONS</div>
+            <div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:0.25rem;text-transform:uppercase">🛒 {{ t().reports.transactions }}</div>
             <div style="font-size:1.25rem;font-weight:700;color:#111827">{{ cashier.total_transactions }}</div>
           </div>
 
           <div>
-            <div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:0.25rem">📊 AVG SALE</div>
+            <div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:0.25rem;text-transform:uppercase">📊 {{ t().reports.avgSale }}</div>
             <div style="font-size:1.25rem;font-weight:700;color:#111827">{{ currency() }}{{ cashier.avg_transaction_value | number:'1.2-2' }}</div>
           </div>
 
           <div *ngIf="cashier.first_sale">
-            <div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:0.25rem">📅 PERIOD</div>
+            <div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:0.25rem;text-transform:uppercase">📅 {{ t().reports.period }}</div>
             <div style="font-size:0.875rem;font-weight:600;color:#111827">
               {{ formatDateShort(cashier.first_sale) }} - {{ formatDateShort(cashier.last_sale) }}
             </div>
           </div>
 
           <div *ngIf="!cashier.first_sale">
-            <div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:0.25rem">📅 STATUS</div>
-            <div style="font-size:0.875rem;font-weight:600;color:#9ca3af">No sales recorded</div>
+            <div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:0.25rem;text-transform:uppercase">📅 {{ t().reports.status }}</div>
+            <div style="font-size:0.875rem;font-weight:600;color:#9ca3af">{{ t().reports.noSalesRecorded }}</div>
           </div>
         </div>
 

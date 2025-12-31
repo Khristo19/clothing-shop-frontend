@@ -19,6 +19,7 @@ type Product = {
   location_id?: number | null;
   location_name?: string | null;
   created_at?: string | null;
+  initial_cost?: number | null;
 };
 
 @Component({
@@ -58,6 +59,7 @@ export class ProductsListComponent {
     image_url: [''],
     description: [''],
     location_id: [null as number | null],
+    initial_cost: [null as number | null, [Validators.min(0)]],
   });
 
   constructor() {
@@ -127,6 +129,7 @@ export class ProductsListComponent {
           location_id: row.location_id ?? null,
           location_name: row.location_name ?? null,
           created_at: row.created_at ?? null,
+          initial_cost: row.initial_cost ? Number(row.initial_cost) : null,
         }));
         this.items.set(normalized);
         this.loading.set(false);
@@ -197,6 +200,7 @@ export class ProductsListComponent {
       description: product.description || '',
       image_url: product.image_url || '',
       location_id: product.location_id || null,
+      initial_cost: product.initial_cost || null,
     });
     if (product.image_url) {
       this.imagePreview.set(product.image_url);
@@ -209,7 +213,7 @@ export class ProductsListComponent {
     this.editingProduct.set(null);
     this.useFileUpload.set(false);
     this.clearImage();
-    this.form.reset({ name: '', price: 0, quantity: 0, size: '', image_url: '', description: '' });
+    this.form.reset({ name: '', price: 0, quantity: 0, size: '', image_url: '', description: '', initial_cost: null });
   }
 
   create() {
@@ -225,6 +229,7 @@ export class ProductsListComponent {
       size: formValues.size || null,
       image_url: formValues.image_url,
       image: this.selectedFile() || undefined,
+      initial_cost: formValues.initial_cost || null,
     };
 
     // Add location_id if selected

@@ -149,6 +149,10 @@ export interface Translations {
     fileFormats: string;
     selected: string;
     units: string;
+    location: string;
+    locationOptional: string;
+    initialCost: string;
+    initialCostOptional: string;
   };
   // Offers
   offers: {
@@ -205,6 +209,35 @@ export interface Translations {
   theme: {
     dark: string;
     light: string;
+  };
+  // Reports
+  reports: {
+    userPerformance: string;
+    userPerformanceSubtitle: string;
+    cashierPerformance: string;
+    totalRevenue: string;
+    totalTransactions: string;
+    activeUsers: string;
+    userRankings: string;
+    exportCSV: string;
+    noSalesData: string;
+    noSalesSubtitle: string;
+    revenue: string;
+    transactions: string;
+    avgSale: string;
+    period: string;
+    status: string;
+    noSalesRecorded: string;
+    role: string;
+    admin: string;
+    cashier: string;
+    thisMonth: string;
+    lastMonth: string;
+    thisYear: string;
+    applyFilters: string;
+    from: string;
+    to: string;
+    dateRange: string;
   };
   // Users
   users: {
@@ -424,6 +457,10 @@ export class TranslationService {
         fileFormats: 'მხარდაჭერილი ფორმატები: JPG, PNG, GIF, WebP • მაქს. ზომა: 5MB',
         selected: 'არჩეულია:',
         units: 'ცალი',
+        location: 'ლოკაცია',
+        locationOptional: 'ლოკაცია (არასავალდებულო)',
+        initialCost: 'საწყისი ღირებულება',
+        initialCostOptional: 'საწყისი ღირებულება (არასავალდებულო)',
       },
       offers: {
         title: 'შეთავაზებები და ფასდაკლებები',
@@ -475,6 +512,34 @@ export class TranslationService {
       theme: {
         dark: 'ბნელი',
         light: 'ღია',
+      },
+      reports: {
+        userPerformance: 'მომხმარებლის შესრულება',
+        userPerformanceSubtitle: 'თვალყური ადევნეთ გაყიდვების მეტრიკას და შესრულებას მომხმარებლების მიხედვით',
+        cashierPerformance: 'მოლარის შესრულება',
+        totalRevenue: 'მთლიანი შემოსავალი',
+        totalTransactions: 'მთლიანი ტრანზაქციები',
+        activeUsers: 'აქტიური მომხმარებლები',
+        userRankings: 'მომხმარებლების რეიტინგი',
+        exportCSV: 'CSV ექსპორტი',
+        noSalesData: 'გაყიდვების მონაცემები არ არის ხელმისაწვდომი',
+        noSalesSubtitle: 'ამ პერიოდში არცერთმა მომხმარებელმა არ ჩაწერა გაყიდვები',
+        revenue: 'შემოსავალი',
+        transactions: 'ტრანზაქციები',
+        avgSale: 'საშ. გაყიდვა',
+        period: 'პერიოდი',
+        status: 'სტატუსი',
+        noSalesRecorded: 'გაყიდვები არ არის ჩაწერილი',
+        role: 'როლი',
+        admin: 'ადმინი',
+        cashier: 'მოლარე',
+        thisMonth: 'ამ თვეში',
+        lastMonth: 'წინა თვეში',
+        thisYear: 'წელს',
+        applyFilters: 'ფილტრების გამოყენება',
+        from: 'საიდან',
+        to: 'სადამდე',
+        dateRange: 'თარიღის დიაპაზონი',
       },
       users: {
         title: 'მომხმარებლები',
@@ -647,6 +712,10 @@ export class TranslationService {
         fileFormats: 'Supported formats: JPG, PNG, GIF, WebP • Max size: 5MB',
         selected: 'Selected:',
         units: 'units',
+        location: 'Location',
+        locationOptional: 'Location (Optional)',
+        initialCost: 'Initial Cost',
+        initialCostOptional: 'Initial Cost (Optional)',
       },
       offers: {
         title: 'Offers & Discounts',
@@ -698,6 +767,34 @@ export class TranslationService {
       theme: {
         dark: 'Dark',
         light: 'Light',
+      },
+      reports: {
+        userPerformance: 'User Performance',
+        userPerformanceSubtitle: 'Track sales metrics and performance by user',
+        cashierPerformance: 'Cashier Performance',
+        totalRevenue: 'Total Revenue',
+        totalTransactions: 'Total Transactions',
+        activeUsers: 'Active Users',
+        userRankings: 'User Rankings',
+        exportCSV: 'Export CSV',
+        noSalesData: 'No sales data available',
+        noSalesSubtitle: 'No users have recorded sales in this period',
+        revenue: 'Revenue',
+        transactions: 'Transactions',
+        avgSale: 'Avg Sale',
+        period: 'Period',
+        status: 'Status',
+        noSalesRecorded: 'No sales recorded',
+        role: 'Role',
+        admin: 'Admin',
+        cashier: 'Cashier',
+        thisMonth: 'This Month',
+        lastMonth: 'Last Month',
+        thisYear: 'This Year',
+        applyFilters: 'Apply Filters',
+        from: 'From',
+        to: 'To',
+        dateRange: 'Date Range',
       },
       users: {
         title: 'Users',

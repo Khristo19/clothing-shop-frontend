@@ -54,6 +54,10 @@
           <input formControlName="price" type="number" step="0.01" placeholder="0.00" />
         </div>
         <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label>{{ t().products.initialCostOptional }}</label>
+          <input formControlName="initial_cost" type="number" step="0.01" placeholder="0.00" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
           <label>{{ t().products.quantity }} *</label>
           <input formControlName="quantity" type="number" placeholder="0" />
         </div>
@@ -70,7 +74,7 @@
 
       <!-- Location Selection -->
       <div style="display:flex;flex-direction:column;gap:.5rem">
-        <label>📍 Location (Optional)</label>
+        <label>📍 {{ t().products.locationOptional }}</label>
         <select formControlName="location_id">
           <option [ngValue]="null">No Location</option>
           <option *ngFor="let location of locations()" [ngValue]="location.id">{{ location.name }}</option>
@@ -144,9 +148,10 @@
         <tr>
           <th style="text-align:left;padding:.75rem;font-weight:500;width:50px">{{ t().products.image }}</th>
           <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.name }}</th>
-          <th style="text-align:left;padding:.75rem;font-weight:500">Location</th>
+          <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.location }}</th>
           <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.size }}</th>
           <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.price }}</th>
+          <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.initialCost }}</th>
           <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.inStock }}</th>
           <th style="text-align:left;padding:.75rem;font-weight:500">{{ t().products.lastUpdated }}</th>
           <th style="text-align:right;padding:.75rem;font-weight:500">{{ t().products.actions }}</th>
@@ -176,6 +181,10 @@
             <span [style.color]="p.size ? (isDarkMode() ? '#e2e8f0' : '#111827') : (isDarkMode() ? '#64748b' : '#9ca3af')">{{ p.size || '-' }}</span>
           </td>
           <td style="padding:.75rem">₾{{ p.price | number:'1.2-2' }}</td>
+          <td style="padding:.75rem">
+            <span *ngIf="p.initial_cost !== null && p.initial_cost !== undefined" style="color:#6b7280">₾{{ p.initial_cost | number:'1.2-2' }}</span>
+            <span *ngIf="p.initial_cost === null || p.initial_cost === undefined" style="color:#9ca3af">-</span>
+          </td>
           <td style="padding:.75rem">
             <span
               [style.color]="p.quantity === 0 ? '#991b1b' : (p.quantity < lowStockThreshold() ? '#b91c1c' : '#166534')"
