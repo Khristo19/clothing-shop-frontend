@@ -540,6 +540,7 @@ export class ReportsComponent implements OnInit {
           label: (context) => {
             const label = context.dataset.label || '';
             const value = context.parsed.y;
+            if (value === null || value === undefined) return `${label}: N/A`;
             if (label.includes('Revenue')) {
               return `${label}: ${value.toFixed(2)} GEL`;
             }
