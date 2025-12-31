@@ -31,7 +31,7 @@ export const GEORGIAN_TRANSLATIONS = {
 
   // Dashboard
   dashboard: {
-    title: 'სამოსის მაღაზია',
+    title: 'ტინა&ტო',
     subtitle: 'ადმინისტრატორის პანელი',
     adminPortal: 'ადმინ პორტალი',
     welcomeBack: 'კეთილი იყოს თქვენი დაბრუნება',

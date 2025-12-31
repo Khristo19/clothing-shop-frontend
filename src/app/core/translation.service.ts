@@ -347,7 +347,7 @@ export class TranslationService {
         passwordWhitespace: 'პაროლი არ უნდა შეიცავდეს მხოლოდ ცარიელ სივრცეს.',
       },
       dashboard: {
-        title: 'სამოსის მაღაზია',
+        title: 'ტინა&ტო',
         subtitle: 'ადმინისტრატორის პანელი',
         adminPortal: 'ადმინ პორტალი',
         welcomeBack: 'კეთილი იყოს თქვენი დაბრუნება',
@@ -602,7 +602,7 @@ export class TranslationService {
         passwordWhitespace: 'Password cannot contain only whitespace.',
       },
       dashboard: {
-        title: 'Clothing Shop',
+        title: 'Tina&to',
         subtitle: 'Admin Dashboard',
         adminPortal: 'Admin Portal',
         welcomeBack: 'Welcome back',
